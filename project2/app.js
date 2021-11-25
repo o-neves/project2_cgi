@@ -16,6 +16,7 @@ let gl;
 let mode;               // Drawing mode (gl.LINES or gl.TRIANGLES)
 let mProjection;
 let mView;
+let mov = 0;
 
 const FLOOR_SCALE = 0.5;
 const FLOOR_CUBES = 20;
@@ -63,11 +64,11 @@ function setup(shaders)
             case 'SPACE':
                 //Dispara um projetil, devendo o mesmo sair pela extremidade do cano, na direção por este apontada
             break;
-            case 'UP ARROW':
-                //avancar tanque
+            case 'ArrowUp':
+                mov += 1;
             break;
-            case 'DOWN ARROW':
-                //recuar tanque1
+            case 'ArrowDown':
+                mov -= 1;
             break;
             case '1':
                 //vista de frente
@@ -106,8 +107,7 @@ function setup(shaders)
     window.requestAnimationFrame(render);
 
 
-    function resize_canvas(event)
-    {
+    function resize_canvas(event){
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
@@ -119,8 +119,7 @@ function setup(shaders)
    
     }
 
-    function uploadModelView()
-    {
+    function uploadModelView(){
         gl.uniformMatrix4fv(gl.getUniformLocation(program, "mModelView"), false, flatten(modelView()));
     }
 
@@ -142,8 +141,7 @@ function setup(shaders)
 
     }
 
-    function floor()
-    {
+    function floor(){
 
         for(let i = 0; i < FLOOR_CUBES;i++){
             for(let j = 0; j < FLOOR_CUBES;j++){
@@ -177,8 +175,8 @@ function setup(shaders)
     }
 
     function turret(){
-        multTranslation([FLOOR_CUBES/2,HULL_HIGHT_FLOOR+1,FLOOR_CUBES/2]);
-        multScale([1.5, 1.7, 1.7]);
+        multTranslation([FLOOR_CUBES/2 + mov,HULL_HIGHT_FLOOR+1,FLOOR_CUBES/2]);
+        multScale([3, 1, 1.7]);
 
         uploadColor(vec3(0.808,0.616,0.851));
         uploadModelView();
@@ -198,10 +196,11 @@ function setup(shaders)
     function wheels(){
 
       pushMatrix();
+        multTranslation([0+mov, 0, 0 ]);
         oneSideWheels();
       popMatrix(); 
       pushMatrix();
-        multTranslation([0, 0, 2 ]);
+        multTranslation([0+mov, 0, 2 ]);
         oneSideWheels();
       popMatrix();
   
@@ -210,23 +209,23 @@ function setup(shaders)
 
     function oneSideWheels(){
         pushMatrix();
-        tire();
+            tire();
         popMatrix();
         pushMatrix();
-        multTranslation([1.4,0,0]);
-        tire();
+            multTranslation([1.4,0,0]);
+            tire();
         popMatrix();
         pushMatrix();
-        multTranslation([-1.4,0,0]);
-        tire();
+            multTranslation([-1.4,0,0]);
+            tire();
         popMatrix();
         pushMatrix();
-        multTranslation([2.8,0,0]);
-        tire();
+            multTranslation([2.8,0,0]);
+            tire();
         popMatrix();
         pushMatrix();
-        multTranslation([-2.8,0,0]);
-        tire();
+            multTranslation([-2.8,0,0]);
+            tire();
         popMatrix();
     }
 
@@ -243,18 +242,18 @@ function setup(shaders)
 
     function hull(){
             pushMatrix();
-            bottomHull();
+                bottomHull();
             popMatrix();
             pushMatrix();
-            spearHull();
+                spearHull();
             popMatrix();
             pushMatrix();
-            topHull();
+                topHull();
             popMatrix();
     }
 
     function topHull(){
-        multTranslation([FLOOR_CUBES/2,HULL_HIGHT_FLOOR + 0.5,FLOOR_CUBES/2]);
+        multTranslation([FLOOR_CUBES/2 + mov,HULL_HIGHT_FLOOR + 0.5,FLOOR_CUBES/2]);
         multScale([6, HULL_HIGHT/2, 2]);
         multRotationZ(180);
 
@@ -265,7 +264,7 @@ function setup(shaders)
 
 
     function bottomHull(){
-        multTranslation([FLOOR_CUBES/2,HULL_HIGHT_FLOOR,FLOOR_CUBES/2]);
+        multTranslation([FLOOR_CUBES/2 + mov,HULL_HIGHT_FLOOR,FLOOR_CUBES/2]);
         multScale([7, HULL_HIGHT, 2]);
         multRotationZ(180);
 
@@ -280,13 +279,13 @@ function setup(shaders)
     function spearHull(){
 
         pushMatrix();
-            multTranslation([FLOOR_CUBES/2-4,HULL_HIGHT_FLOOR,FLOOR_CUBES/2]);
+            multTranslation([FLOOR_CUBES/2-4 + mov,HULL_HIGHT_FLOOR,FLOOR_CUBES/2]);
             multScale([1, HULL_HIGHT, 2]);
             multRotationZ(90);
             spear();
         popMatrix();
         pushMatrix();
-            multTranslation([FLOOR_CUBES/2+4,HULL_HIGHT_FLOOR,FLOOR_CUBES/2]);
+            multTranslation([FLOOR_CUBES/2+4 + mov,HULL_HIGHT_FLOOR,FLOOR_CUBES/2]);
             multScale([1, HULL_HIGHT, 2]);
             multRotationZ(-90);
             spear();
@@ -302,8 +301,7 @@ function setup(shaders)
     }
 
 
-    function render()
-    {
+    function render(){
     
         window.requestAnimationFrame(render);
 
@@ -320,7 +318,7 @@ function setup(shaders)
             floor();
         popMatrix();
         pushMatrix();
-            tank();
+            tank(mov);
         popMatrix();
      
     

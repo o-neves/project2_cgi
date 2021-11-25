@@ -23,8 +23,6 @@ const HULL_HIGHT = 1;
 const HULL_HIGHT_FLOOR = 1.5;
 
 
-
-
 function setup(shaders)
 {
     let canvas = document.getElementById("gl-canvas");
@@ -36,7 +34,7 @@ function setup(shaders)
 
 
     mView = lookAt(vec3(FLOOR_CUBES/2,0,0),vec3(FLOOR_CUBES/2,0,FLOOR_CUBES/2),vec3(0,1,0));
-    mode = gl.LINES;
+    mode = gl.TRIANGLES;
 
 
     resize_canvas();
@@ -160,7 +158,7 @@ function setup(shaders)
     }
 
     function tank(){
-        
+
         pushMatrix();
             hull();
         popMatrix();
@@ -170,6 +168,9 @@ function setup(shaders)
         pushMatrix();
             wheels();
         popMatrix();
+        pushMatrix();
+        barrel();
+        popMatrix();
 
        
   
@@ -177,12 +178,21 @@ function setup(shaders)
 
     function turret(){
         multTranslation([FLOOR_CUBES/2,HULL_HIGHT_FLOOR+1,FLOOR_CUBES/2]);
-        multScale([3, 1, 1.7]);
+        multScale([1.5, 1.7, 1.7]);
 
-        uploadColor(vec3(1,1,0));
+        uploadColor(vec3(0.808,0.616,0.851));
         uploadModelView();
-        CUBE.draw(gl, program, mode);
+        CYLINDER.draw(gl, program, mode);
 
+    }
+
+    function barrel(){
+        multTranslation([FLOOR_CUBES/2+1.,HULL_HIGHT_FLOOR+1.5,FLOOR_CUBES/2]);
+        multScale([1.5, 0.2, 0.3]);
+
+        uploadColor(vec3(0.808,0.616,0.851));
+        uploadModelView();
+        CYLINDER.draw(gl, program, mode);3
     }
 
     function wheels(){
@@ -226,7 +236,7 @@ function setup(shaders)
         multRotationX(90);
 
         
-        uploadColor(vec3(0.2,0.235,0.035));
+        uploadColor(vec3(0.584,0.49,0.678));
         uploadModelView();
         TORUS.draw(gl, program, mode);
     }

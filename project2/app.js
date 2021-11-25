@@ -86,6 +86,7 @@ function setup(shaders)
             break;
             case '4':
                 //projecao axonometrica
+                mView = lookAt(vec3(FLOOR_CUBES,4,FLOOR_CUBES),vec3(FLOOR_CUBES/2,0,FLOOR_CUBES/2),vec3(0,1,0));
             break;
             case '+':
                 //zoom in
@@ -191,7 +192,7 @@ function setup(shaders)
 
         uploadColor(vec3(0.808,0.616,0.851));
         uploadModelView();
-        CYLINDER.draw(gl, program, mode);3
+        CYLINDER.draw(gl, program, mode);
     }
 
     function wheels(){
@@ -234,7 +235,6 @@ function setup(shaders)
         multTranslation([FLOOR_CUBES/2,0.8,FLOOR_CUBES/2 - 1]);
         multRotationZ(90);
         multRotationX(90);
-
         
         uploadColor(vec3(0.584,0.49,0.678));
         uploadModelView();
@@ -319,7 +319,7 @@ function setup(shaders)
             floor();
         popMatrix();
         pushMatrix();
-            multTranslation([mov + mov,0,0]);
+            multTranslation([0 + mov,0,0]);
             tank();
         popMatrix();
      

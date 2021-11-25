@@ -181,7 +181,7 @@ function setup(shaders){
     function axle(){
 
         multTranslation([FLOOR_CUBES/2 ,0.8 ,FLOOR_CUBES/2]);
-        multScale([6, 0.2, 3]);
+        multScale([6.3, 0.2, 3]);
 
         uploadColor(vec3(1,1,0.851));
         uploadModelView();

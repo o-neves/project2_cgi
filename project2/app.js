@@ -205,22 +205,17 @@ function setup(shaders){
         multTranslation([FLOOR_CUBES/2 , 1.0 ,FLOOR_CUBES/2]);
         multScale([0.1, 0.1, 2.5]);
 
+        uploadColor(vec3(1,1,0.851));
+        uploadModelView();
+        CUBE.draw(gl, program, mode);
+    }
+
     /*function barraAoLado(){
 
         multTranslation([FLOOR_CUBES/2 ,0.8 ,FLOOR_CUBES/2-1]);
         multScale([6.3, 0.2, 0.4]);
 
         uploadColor(vec3(1,1,0));
-        uploadModelView();
-        CUBE.draw(gl, program, mode);
-    }*/
-
-    /*function barraAoLado(){
-
-        multTranslation([FLOOR_CUBES/2 ,1.0 ,FLOOR_CUBES/2]);
-        multScale([6, 0.1, 3]);
-
-        uploadColor(vec3(1,1,0.851));
         uploadModelView();
         CUBE.draw(gl, program, mode);
     }*/

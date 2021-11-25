@@ -319,7 +319,7 @@ function setup(shaders)
             floor();
         popMatrix();
         pushMatrix();
-            multTranslation([mov + mov,0,0]);
+            multTranslation([0 + mov,0,0]);
             tank();
         popMatrix();
      

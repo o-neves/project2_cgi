@@ -16,16 +16,18 @@ let gl;
 let mode;               // Drawing mode (gl.LINES or gl.TRIANGLES)
 let mProjection;
 let mView;
-let mov = 0;
+let mov = 0.0;
+let rot=0;
 
 const FLOOR_SCALE = 0.5;
 const FLOOR_CUBES = 20;
 const HULL_HIGHT = 1;
 const HULL_HIGHT_FLOOR = 1.5;
+const TANK_MOVE = 0.1;
+const PI = 3.14159265359;
 
 
-function setup(shaders)
-{
+function setup(shaders){
     let canvas = document.getElementById("gl-canvas");
     let aspect = canvas.width / canvas.height;
 
@@ -65,10 +67,12 @@ function setup(shaders)
                 //Dispara um projetil, devendo o mesmo sair pela extremidade do cano, na direção por este apontada
             break;
             case 'ArrowUp':
-                mov += 1;
+                mov += TANK_MOVE;
+                rot += (1 * (TANK_MOVE / 1) * (180 / PI));
             break;
             case 'ArrowDown':
-                mov -= 1;
+                mov -= TANK_MOVE;
+                rot += (-1 * (TANK_MOVE / 1) * (180 / PI));
             break;
             case '1':
                 //vista de frente
@@ -233,6 +237,7 @@ function setup(shaders)
 
     function tire(){
         multTranslation([FLOOR_CUBES/2,0.8,FLOOR_CUBES/2 - 1]);
+        multRotationZ(rot);
         multRotationX(90);
         
         uploadColor(vec3(0.584,0.49,0.678));

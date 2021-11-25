@@ -271,13 +271,26 @@ function setup(shaders){
     }
 
     function topHull(){
-        multTranslation([FLOOR_CUBES/2,HULL_HIGHT_FLOOR + 0.65,FLOOR_CUBES/2]);
-        multScale([6, HULL_HIGHT/3, 2]);
-        multRotationZ(180);
+        
+        pushMatrix();
+            multTranslation([FLOOR_CUBES/2,HULL_HIGHT_FLOOR + 0.65,FLOOR_CUBES/2]);
+            multScale([6, HULL_HIGHT/3, 2]);
+            multRotationZ(180);
 
-        uploadColor(vec3(0.255,0.298,0.4));
-        uploadModelView();
-        CUBE.draw(gl, program, mode);
+            uploadColor(vec3(0.255,0.298,0.4));
+            uploadModelView();
+            CUBE.draw(gl, program, mode);
+        popMatrix();
+        pushMatrix();
+            multTranslation([FLOOR_CUBES/2 + 3.5,HULL_HIGHT_FLOOR + 0.65,FLOOR_CUBES/2]);
+            multScale([1, HULL_HIGHT/3, 2]);
+            multRotationZ(-90);
+
+            uploadColor(vec3(1,1,1));
+            uploadModelView();
+            PYRAMID.draw(gl, program, mode);
+        popMatrix();
+
     }
 
 

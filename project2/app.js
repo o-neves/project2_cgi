@@ -249,7 +249,6 @@ function setup(shaders)
         uploadColor(vec3(1,0,0));
         uploadModelView();
         CUBE.draw(gl, program, mode);
-     
     }
 
     function topHull(){

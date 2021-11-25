@@ -164,19 +164,20 @@ function setup(shaders)
             turret();
         popMatrix();
         pushMatrix();
-            wheels();
-        popMatrix();
-        pushMatrix();
         barrel();
         popMatrix();
+        pushMatrix();
+            wheels();
+        popMatrix();
+       
 
        
   
     }
 
     function turret(){
-        multTranslation([FLOOR_CUBES/2 + mov,HULL_HIGHT_FLOOR+1,FLOOR_CUBES/2]);
-        multScale([3, 1, 1.7]);
+        multTranslation([FLOOR_CUBES/2 ,HULL_HIGHT_FLOOR+1,FLOOR_CUBES/2]);
+        multScale([1.7, 1.7, 1.7]);
 
         uploadColor(vec3(0.808,0.616,0.851));
         uploadModelView();
@@ -196,11 +197,11 @@ function setup(shaders)
     function wheels(){
 
       pushMatrix();
-        multTranslation([0+mov, 0, 0 ]);
+        multTranslation([0, 0, 0 ]);
         oneSideWheels();
       popMatrix(); 
       pushMatrix();
-        multTranslation([0+mov, 0, 2 ]);
+        multTranslation([0, 0, 2 ]);
         oneSideWheels();
       popMatrix();
   
@@ -253,7 +254,7 @@ function setup(shaders)
     }
 
     function topHull(){
-        multTranslation([FLOOR_CUBES/2 + mov,HULL_HIGHT_FLOOR + 0.5,FLOOR_CUBES/2]);
+        multTranslation([FLOOR_CUBES/2,HULL_HIGHT_FLOOR + 0.5,FLOOR_CUBES/2]);
         multScale([6, HULL_HIGHT/2, 2]);
         multRotationZ(180);
 
@@ -264,7 +265,7 @@ function setup(shaders)
 
 
     function bottomHull(){
-        multTranslation([FLOOR_CUBES/2 + mov,HULL_HIGHT_FLOOR,FLOOR_CUBES/2]);
+        multTranslation([FLOOR_CUBES/2,HULL_HIGHT_FLOOR,FLOOR_CUBES/2]);
         multScale([7, HULL_HIGHT, 2]);
         multRotationZ(180);
 
@@ -279,13 +280,13 @@ function setup(shaders)
     function spearHull(){
 
         pushMatrix();
-            multTranslation([FLOOR_CUBES/2-4 + mov,HULL_HIGHT_FLOOR,FLOOR_CUBES/2]);
+            multTranslation([FLOOR_CUBES/2-4,HULL_HIGHT_FLOOR,FLOOR_CUBES/2]);
             multScale([1, HULL_HIGHT, 2]);
             multRotationZ(90);
             spear();
         popMatrix();
         pushMatrix();
-            multTranslation([FLOOR_CUBES/2+4 + mov,HULL_HIGHT_FLOOR,FLOOR_CUBES/2]);
+            multTranslation([FLOOR_CUBES/2+4,HULL_HIGHT_FLOOR,FLOOR_CUBES/2]);
             multScale([1, HULL_HIGHT, 2]);
             multRotationZ(-90);
             spear();
@@ -318,7 +319,8 @@ function setup(shaders)
             floor();
         popMatrix();
         pushMatrix();
-            tank(mov);
+            multTranslation([mov + mov,0,0]);
+            tank();
         popMatrix();
      
     

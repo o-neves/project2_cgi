@@ -175,9 +175,17 @@ function setup(shaders){
             wheels();
         popMatrix();
        
+    }
 
-       
-  
+
+    function axle(){
+
+        multTranslation([FLOOR_CUBES/2 ,0.8 ,FLOOR_CUBES/2]);
+        multScale([6, 0.2, 3]);
+
+        uploadColor(vec3(1,1,0.851));
+        uploadModelView();
+        CUBE.draw(gl, program, mode);
     }
 
     function turret(){
@@ -208,6 +216,9 @@ function setup(shaders){
       pushMatrix();
         multTranslation([0, 0, 2 ]);
         oneSideWheels();
+      popMatrix();
+      pushMatrix();
+        axle();
       popMatrix();
   
     
@@ -277,9 +288,6 @@ function setup(shaders){
         uploadModelView();
         CUBE.draw(gl, program, mode);
     }
-
-
-
 
     function spearHull(){
 

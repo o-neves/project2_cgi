@@ -101,7 +101,7 @@ function setup(shaders){
         }
     }
 
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clearColor(0.573,0.573,0.573, 1.0);
     CUBE.init(gl);
     SPHERE.init(gl);
     TORUS.init(gl);
@@ -178,15 +178,17 @@ function setup(shaders){
     }
 
 
-    function axle(){
 
-        multTranslation([FLOOR_CUBES/2 ,0.8 ,FLOOR_CUBES/2]);
-        multScale([6.3, 0.2, 3]);
 
-        uploadColor(vec3(1,1,0.851));
+    /*function barraAoLado(){
+
+        multTranslation([FLOOR_CUBES/2 ,0.8 ,FLOOR_CUBES/2-1]);
+        multScale([6.3, 0.2, 0.4]);
+
+        uploadColor(vec3(1,1,0));
         uploadModelView();
         CUBE.draw(gl, program, mode);
-    }
+    }*/
 
     function turret(){
         multTranslation([FLOOR_CUBES/2 ,HULL_HIGHT_FLOOR+1,FLOOR_CUBES/2]);
@@ -269,8 +271,8 @@ function setup(shaders){
     }
 
     function topHull(){
-        multTranslation([FLOOR_CUBES/2,HULL_HIGHT_FLOOR + 0.5,FLOOR_CUBES/2]);
-        multScale([6, HULL_HIGHT/2, 2]);
+        multTranslation([FLOOR_CUBES/2,HULL_HIGHT_FLOOR + 0.65,FLOOR_CUBES/2]);
+        multScale([6, HULL_HIGHT/3, 2]);
         multRotationZ(180);
 
         uploadColor(vec3(0.255,0.298,0.4));

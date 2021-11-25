@@ -169,7 +169,7 @@ function setup(shaders){
             turret();
         popMatrix();
         pushMatrix();
-        barrel();
+            barrel();
         popMatrix();
         pushMatrix();
             wheels();
@@ -178,7 +178,37 @@ function setup(shaders){
     }
 
 
+    function axleSet(){
+        pushMatrix();
+            multTranslation([0, 0, 0 ]);
+            axle();
+        popMatrix(); 
+        pushMatrix();
+            multTranslation([1.4, 0, 0 ]);
+            axle();
+        popMatrix();
+        pushMatrix();
+            multTranslation([2.8, 0, 0 ]);
+            axle();
+        popMatrix();
+        pushMatrix();
+            multTranslation([-1.4, 0, 0 ]);
+            axle();
+        popMatrix();
+        pushMatrix();
+            multTranslation([-2.8, 0, 0 ]);
+            axle();
+        popMatrix();
+    }
 
+    function axle(){
+        multTranslation([FLOOR_CUBES/2 , 1.0 ,FLOOR_CUBES/2]);
+        multScale([0.1, 0.1, 2.5]);
+
+        uploadColor(vec3(1,1,0.851));
+        uploadModelView();
+        CUBE.draw(gl, program, mode);
+    }
 
     /*function barraAoLado(){
 
@@ -220,7 +250,7 @@ function setup(shaders){
         oneSideWheels();
       popMatrix();
       pushMatrix();
-        axle();
+        axleSet();
       popMatrix();
   
     

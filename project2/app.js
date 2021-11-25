@@ -126,10 +126,15 @@ function setup(shaders)
     }
 
 
-    function tiles(){
+    function tiles(x,z){
 
         // Send the current modelview matrix to the vertex shader
-        uploadColor(vec3(1,0,1));
+        if((z%2 == 0 && x%2 != 0) || (x%2 == 0 && z%2 != 0)){
+            uploadColor(vec3(1,0,1));
+        }
+        else{
+            uploadColor(vec3(0,0,1));
+        }
         uploadModelView();
         CUBE.draw(gl, program, mode);
 
@@ -143,7 +148,7 @@ function setup(shaders)
                 pushMatrix();
                     multTranslation([i,0,j]);
                     multScale([1, FLOOR_SCALE, 1]);
-                    tiles();
+                    tiles(i,j);
                 popMatrix();
             }
         }

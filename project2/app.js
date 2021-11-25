@@ -16,7 +16,7 @@ let gl;
 let mode;               // Drawing mode (gl.LINES or gl.TRIANGLES)
 let mProjection;
 let mView;
-let mov = 0.0;
+let mov = 0;
 
 const FLOOR_SCALE = 0.5;
 const FLOOR_CUBES = 20;
@@ -65,10 +65,10 @@ function setup(shaders)
                 //Dispara um projetil, devendo o mesmo sair pela extremidade do cano, na direção por este apontada
             break;
             case 'ArrowUp':
-                mov += 0.1;
+                mov += 1;
             break;
             case 'ArrowDown':
-                mov -= 0.1;
+                mov -= 1;
             break;
             case '1':
                 //vista de frente
@@ -165,7 +165,7 @@ function setup(shaders)
             turret();
         popMatrix();
         pushMatrix();
-            barrel();
+        barrel();
         popMatrix();
         pushMatrix();
             wheels();
@@ -190,7 +190,7 @@ function setup(shaders)
         multTranslation([FLOOR_CUBES/2+1.,HULL_HIGHT_FLOOR+1.5,FLOOR_CUBES/2]);
         multScale([1.5, 0.2, 0.3]);
 
-        uploadColor(vec3(0.808, 0.616, 0.851));
+        uploadColor(vec3(0.808,0.616,0.851));
         uploadModelView();
         CYLINDER.draw(gl, program, mode);
     }
@@ -233,7 +233,6 @@ function setup(shaders)
 
     function tire(){
         multTranslation([FLOOR_CUBES/2,0.8,FLOOR_CUBES/2 - 1]);
-        multRotationZ(90);
         multRotationX(90);
         
         uploadColor(vec3(0.584,0.49,0.678));

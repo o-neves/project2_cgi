@@ -6,6 +6,7 @@ import * as SPHERE from '../../../libs/sphere.js';
 import * as CUBE from '../../../libs/cube.js';
 import * as TORUS from '../../../libs/torus.js';
 import * as PYRAMID from '../../../libs/pyramid.js';
+import * as CYLINDER from '../../../libs/cylinder.js';
 
 /** @type WebGLRenderingContext */
 let gl;
@@ -15,7 +16,6 @@ let gl;
 let mode;               // Drawing mode (gl.LINES or gl.TRIANGLES)
 let mProjection;
 let mView;
-let vecMView = [];
 
 const FLOOR_SCALE = 0.5;
 const FLOOR_CUBES = 20;
@@ -102,6 +102,7 @@ function setup(shaders)
     SPHERE.init(gl);
     TORUS.init(gl);
     PYRAMID.init(gl);
+    CYLINDER.init(gl);
     gl.enable(gl.DEPTH_TEST);   // Enables Z-buffer depth test
     
     window.requestAnimationFrame(render);
@@ -132,7 +133,6 @@ function setup(shaders)
 
     function tiles(x,z){
 
-        // Send the current modelview matrix to the vertex shader
         if((z%2 == 0 && x%2 != 0) || (x%2 == 0 && z%2 != 0)){
             uploadColor(vec3(0.91,0.863,0.792));
         }
@@ -160,7 +160,7 @@ function setup(shaders)
     }
 
     function tank(){
-
+        
         pushMatrix();
             hull();
         popMatrix();
@@ -236,8 +236,21 @@ function setup(shaders)
             bottomHull();
             popMatrix();
             pushMatrix();
+            spearHull();
+            popMatrix();
+            pushMatrix();
             topHull();
             popMatrix();
+    }
+
+    function topHull(){
+        multTranslation([FLOOR_CUBES/2,HULL_HIGHT_FLOOR + 0.5,FLOOR_CUBES/2]);
+        multScale([6, HULL_HIGHT/2, 2]);
+        multRotationZ(180);
+
+        uploadColor(vec3(0.255,0.298,0.4));
+        uploadModelView();
+        CUBE.draw(gl, program, mode);
     }
 
 
@@ -246,31 +259,34 @@ function setup(shaders)
         multScale([7, HULL_HIGHT, 2]);
         multRotationZ(180);
 
-        uploadColor(vec3(1,0,0));
+        uploadColor(vec3(0.467,0.62,0.796));
         uploadModelView();
         CUBE.draw(gl, program, mode);
     }
 
-    function topHull(){
+
+
+
+    function spearHull(){
 
         pushMatrix();
             multTranslation([FLOOR_CUBES/2-4,HULL_HIGHT_FLOOR,FLOOR_CUBES/2]);
             multScale([1, HULL_HIGHT, 2]);
             multRotationZ(90);
-            spearHull();
+            spear();
         popMatrix();
         pushMatrix();
             multTranslation([FLOOR_CUBES/2+4,HULL_HIGHT_FLOOR,FLOOR_CUBES/2]);
             multScale([1, HULL_HIGHT, 2]);
             multRotationZ(-90);
-            spearHull();
+            spear();
         popMatrix();
 
     }
 
-    function spearHull(){
+    function spear(){
        
-        uploadColor(vec3(1,0,0));
+        uploadColor(vec3(0.467,0.62,0.796));
         uploadModelView();
         PYRAMID.draw(gl, program, mode);
     }

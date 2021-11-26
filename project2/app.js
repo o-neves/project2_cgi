@@ -226,7 +226,7 @@ function setup(shaders){
 
         uploadColor(vec3(0.808,0.616,0.851));
         uploadModelView();
-        CYLINDER.draw(gl, program, mode);
+        SPHERE.draw(gl, program, mode);
 
     }
 

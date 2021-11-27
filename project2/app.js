@@ -21,6 +21,8 @@ let rot = 0;
 let zoom = 10;
 
 
+const ZOOM = 10;
+
 const PI = 3.14159265359;
 const FLOOR_DIAMETER = 1;
 const HULL_HEIGHT = 1.5;
@@ -124,15 +126,15 @@ function setup(shaders){
                 mView = lookAt(vec3(FLOOR_CUBES,4,FLOOR_CUBES),vec3(FLOOR_CUBES/2,0,FLOOR_CUBES/2),vec3(0,1,0));
             break;
             case '+':
-                if (zoom > 6){
+                if (zoom > 1){
                     zoom -= 1;
                     //ortho(left, right, bottom, top, near, far)
-                    mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*zoom, 3*zoom);
+                    mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*ZOOM, 3*ZOOM);
                 }
                 break;
             case '-':
                 zoom += 1;
-                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*zoom, 3*zoom);
+                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*ZOOM, 3*ZOOM);
                 break;
         }
     }
@@ -222,28 +224,37 @@ function setup(shaders){
         popMatrix();
 
         pushMatrix();
-        multTranslation([TIRE_DIAMETER,0,0]);
-        wheelsAndAxle();
+            multTranslation([TIRE_DIAMETER,0,0]);
+            wheelsAndAxle();
         popMatrix();
 
         pushMatrix();
-        multTranslation([-TIRE_DIAMETER,0,0]);
-        wheelsAndAxle();
+            multTranslation([-TIRE_DIAMETER,0,0]);
+            wheelsAndAxle();
         popMatrix();
 
         pushMatrix();
-        multTranslation([2*-TIRE_DIAMETER,0,0]);
-        wheelsAndAxle();
+            multTranslation([2*-TIRE_DIAMETER,0,0]);
+            wheelsAndAxle();
         popMatrix();
 
         pushMatrix();
-        multTranslation([2*TIRE_DIAMETER,0,0]);
-        wheelsAndAxle();
+            multTranslation([2*TIRE_DIAMETER,0,0]);
+            wheelsAndAxle();
+        popMatrix();
+
+        pushMatrix();
+            multTranslation([CENTER-0.4 , TIRE_HEIGHT_FLOOR ,CENTER]);
+            multScale([TIRE_DIAMETER/6, TIRE_DIAMETER/6, TANK_DEPT]);  //((NUMBER_OF_TIRES - 2) * TIRE_DIAMETER) + 2 * (0.5 * TIRE_DIAMETER)
+            multRotationY(90);
+            axle();
         popMatrix();
     }
 
     function wheelsAndAxle(){
         pushMatrix();
+            multTranslation([CENTER , TIRE_HEIGHT_FLOOR ,CENTER]);
+            multScale([TIRE_DIAMETER/6, TIRE_DIAMETER/6, TANK_DEPT]);
             axle();
         popMatrix(); 
         pushMatrix();
@@ -254,8 +265,8 @@ function setup(shaders){
 
 
     function axle(){
-        multTranslation([CENTER , TIRE_HEIGHT_FLOOR ,CENTER]);
-        multScale([TIRE_DIAMETER/6, TIRE_DIAMETER/6, TANK_DEPT]);
+        //multTranslation([CENTER , TIRE_HEIGHT_FLOOR ,CENTER]);
+        //multScale([TIRE_DIAMETER/6, TIRE_DIAMETER/6, TANK_DEPT]);
         multRotationX(90);
 
         uploadColor(vec3(0.78,0.761,0.929));

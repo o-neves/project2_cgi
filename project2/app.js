@@ -37,6 +37,7 @@ const TIRE_DIAMETER_SCALE = HULL_HEIGHT/2;
 const TIRE_DIAMETER = 1.4 * TIRE_DIAMETER_SCALE;
 const TIRE_HEIGHT_FLOOR = FLOOR_HEIGHT/2 + TIRE_DIAMETER/2 ;
 const TIRE_DEPT = TANK_DEPT/2;
+const NUMBER_OF_TIRES = 5;
 
 const RIM_DEPT_SCALE = TIRE_DEPT/2;
 
@@ -93,13 +94,13 @@ function setup(shaders){
                 //Dispara um projetil, devendo o mesmo sair pela extremidade do cano, na direção por este apontada
             break;
             case 'ArrowUp':
-                if(mov <= (FLOOR_CUBES/2 - 4) ){
+                if(mov <= ((FLOOR_CUBES/2) - (NUMBER_OF_TIRES/2 * TIRE_DIAMETER)) ){
                     mov += TANK_MOVE;
                     rot += (1 * (TANK_MOVE / 1) * (180 / PI));
                 }
             break;
             case 'ArrowDown':
-                if(mov >= -(FLOOR_CUBES/2 - 3) ){
+                if(mov >= -((FLOOR_CUBES/2) - (NUMBER_OF_TIRES/2 * TIRE_DIAMETER)) ){
                     mov -= TANK_MOVE;
                     rot += (-1 * (TANK_MOVE / 1) * (180 / PI));
                 }
@@ -386,7 +387,8 @@ function setup(shaders){
             floor();
         popMatrix();
         pushMatrix();
-            multTranslation([0 + mov,0,0]);
+            if(FLOOR_CUBES % 2 == 0) multTranslation([ (0-FLOOR_DIAMETER/2) + mov, 0, 0]);
+            else multTranslation([0 + mov, 0, 0]);
             tank();
         popMatrix();
      

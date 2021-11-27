@@ -350,7 +350,7 @@ function setup(shaders){
         popMatrix();
 
         pushMatrix();
-            multTranslation([CENTER , TIRE_HEIGHT_FLOOR ,CENTER]);
+            multTranslation([CENTER, TIRE_HEIGHT_FLOOR ,CENTER]);
             //ARRANJAR CONSTANTE PARA X,Y,Z
             multScale([MIDDLE_AXEL_WIDTH, TIRE_DIAMETER/6, TIRE_DIAMETER/6]);  //((NUMBER_OF_TIRES - 2) * TIRE_DIAMETER) + 2 * (0.5 * TIRE_DIAMETER)
             multRotationY(90);
@@ -362,7 +362,6 @@ function setup(shaders){
         pushMatrix();
             multTranslation([CENTER , TIRE_HEIGHT_FLOOR ,CENTER]);
             multScale([TIRE_DIAMETER/6, TIRE_DIAMETER/6, TANK_DEPT]);
-            //multRotationX(90);
             axle();
         popMatrix(); 
         pushMatrix();
@@ -373,8 +372,6 @@ function setup(shaders){
 
 
     function axle(){
-        //multTranslation([CENTER , TIRE_HEIGHT_FLOOR ,CENTER]);
-        //multScale([TIRE_DIAMETER/6, TIRE_DIAMETER/6, TANK_DEPT]);
         multRotationX(90);
 
         uploadColor(vec3(0.78,0.761,0.929));

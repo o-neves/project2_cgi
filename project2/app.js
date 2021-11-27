@@ -17,7 +17,8 @@ let mode;               // Drawing mode (gl.LINES or gl.TRIANGLES)
 let mProjection;
 let mView;
 let mov = 0.0;
-let rot=0;
+let rot = 0;
+let zoom = 10;
 
 const FLOOR_SCALE = 0.5;
 const FLOOR_CUBES = 20;
@@ -67,12 +68,16 @@ function setup(shaders){
                 //Dispara um projetil, devendo o mesmo sair pela extremidade do cano, na direção por este apontada
             break;
             case 'ArrowUp':
-                mov += TANK_MOVE;
-                rot += (1 * (TANK_MOVE / 1) * (180 / PI));
+                if(mov <= (FLOOR_CUBES/2 - 4) ){
+                    mov += TANK_MOVE;
+                    rot += (1 * (TANK_MOVE / 1) * (180 / PI));
+                }
             break;
             case 'ArrowDown':
-                mov -= TANK_MOVE;
-                rot += (-1 * (TANK_MOVE / 1) * (180 / PI));
+                if(mov >= -(FLOOR_CUBES/2 - 3) ){
+                    mov -= TANK_MOVE;
+                    rot += (-1 * (TANK_MOVE / 1) * (180 / PI));
+                }
             break;
             case '1':
                 //vista de frente
@@ -93,10 +98,15 @@ function setup(shaders){
                 mView = lookAt(vec3(FLOOR_CUBES,4,FLOOR_CUBES),vec3(FLOOR_CUBES/2,0,FLOOR_CUBES/2),vec3(0,1,0));
             break;
             case '+':
-                //zoom in
+                if (zoom > 6){
+                    zoom -= 1;
+                    //ortho(left, right, bottom, top, near, far)
+                    mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*zoom, 3*zoom);
+                }
                 break;
             case '-':
-                //zoom out
+                zoom += 1;
+                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*zoom, 3*zoom);
                 break;
         }
     }
@@ -120,7 +130,7 @@ function setup(shaders){
 
         gl.viewport(0,0,canvas.width, canvas.height);
 
-        mProjection = ortho(-FLOOR_CUBES/2*aspect,FLOOR_CUBES/2*aspect, -FLOOR_CUBES/2, FLOOR_CUBES/2,-3*FLOOR_CUBES/2,3*FLOOR_CUBES/2);
+        mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*zoom, 3*zoom);
    
     }
 

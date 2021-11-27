@@ -122,7 +122,7 @@ function setup(shaders){
             break;
             case '1':
                 //vista de frente
-                mView = lookAt(vec3(CENTER,0,CENTER),vec3(CENTER,0,CENTER),vec3(0,1,0));
+                mView = lookAt(vec3(-CENTER,0,CENTER),vec3(CENTER,0,CENTER),vec3(0,1,0));
               
                break;
             case '2':

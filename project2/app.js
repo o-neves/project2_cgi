@@ -67,6 +67,8 @@ const TURRET_BASE_HEIGHT = TURRET_HEIGHT*0.1;
 const TURRET_BASE_DEPT= TURRET_DEPT*1.1;
 const TURRET_BASE_HEIGHT_FLOOR = TURRET_HEIGHT_FLOOR + TURRET_BASE_HEIGHT/2;
 
+const MIDDLE_AXEL_WIDTH = TIRE_DIAMETER*4;
+
 
 function setup(shaders){
     let canvas = document.getElementById("gl-canvas");
@@ -77,8 +79,8 @@ function setup(shaders){
     let program = buildProgramFromSources(gl, shaders["shader.vert"], shaders["shader.frag"]);
 
 
-    mView = lookAt(vec3(FLOOR_CUBES/2,0,0),vec3(FLOOR_CUBES/2,0,FLOOR_CUBES/2),vec3(0,1,0));
-    mode = gl.TRIANGLES;
+    mView = lookAt(vec3(FLOOR_CUBES,4,FLOOR_CUBES),vec3(CENTER,0,CENTER),vec3(0,1,0));
+    mode = gl.LINES;
 
 
     resize_canvas();
@@ -348,8 +350,9 @@ function setup(shaders){
         popMatrix();
 
         pushMatrix();
-            multTranslation([CENTER-0.4 , TIRE_HEIGHT_FLOOR ,CENTER]);
-            multScale([TIRE_DIAMETER/6, TIRE_DIAMETER/6, TANK_DEPT]);  //((NUMBER_OF_TIRES - 2) * TIRE_DIAMETER) + 2 * (0.5 * TIRE_DIAMETER)
+            multTranslation([CENTER , TIRE_HEIGHT_FLOOR ,CENTER]);
+            //ARRANJAR CONSTANTE PARA X,Y,Z
+            multScale([MIDDLE_AXEL_WIDTH, TIRE_DIAMETER/6, TIRE_DIAMETER/6]);  //((NUMBER_OF_TIRES - 2) * TIRE_DIAMETER) + 2 * (0.5 * TIRE_DIAMETER)
             multRotationY(90);
             axle();
         popMatrix();
@@ -359,6 +362,7 @@ function setup(shaders){
         pushMatrix();
             multTranslation([CENTER , TIRE_HEIGHT_FLOOR ,CENTER]);
             multScale([TIRE_DIAMETER/6, TIRE_DIAMETER/6, TANK_DEPT]);
+            //multRotationX(90);
             axle();
         popMatrix(); 
         pushMatrix();

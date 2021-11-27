@@ -19,8 +19,13 @@ let mView;
 let mov = 0.0;
 let rot = 0;
 let zoom = 10;
+let turretDegre = 0;
+let barrelDegre = 15;
 
-
+const MAX_BARREL_DEGREE = 180;
+const MIN_BARREL_DEGREE = 0;
+const BARREL_MOV = 5;
+const TURRET_MOV = 5;
 const PI = 3.14159265359;
 const FLOOR_DIAMETER = 1;
 const HULL_HEIGHT = 1.5;
@@ -43,7 +48,7 @@ const RIM_DEPT_SCALE = TIRE_DEPT/2;
 const HULL_HEIGHT_FLOOR = TIRE_HEIGHT_FLOOR + HULL_HEIGHT/2;
 
 const TURRET_WIDHT = HULL_WIDTH/2;
-const TURRET_HEIGHT = HULL_HEIGHT;
+const TURRET_HEIGHT = HULL_HEIGHT*1.1;
 const TURRET_DEPT = TANK_DEPT/1.5;
 const TURRET_HEIGHT_FLOOR = HULL_HEIGHT_FLOOR + HULL_HEIGHT/2;
 
@@ -52,6 +57,12 @@ const BARREL_HEIGHT = TURRET_HEIGHT/6.5;
 const BARREL_DEPT = TURRET_DEPT/6; 
 const BARREL_WIDHT_FLOOR = CENTER+TURRET_WIDHT/2;
 const BARREL_HEIGHT_FLOOR = HULL_HEIGHT_FLOOR + HULL_HEIGHT/1.1; 
+
+const TURRET_BASE_WIDHT = TURRET_WIDHT*1.1;
+const TURRET_BASE_HEIGHT = TURRET_HEIGHT*0.1;
+const TURRET_BASE_DEPT= TURRET_DEPT*1.1;
+const TURRET_BASE_HEIGHT_FLOOR = TURRET_HEIGHT_FLOOR + TURRET_BASE_HEIGHT/2;
+
 
 function setup(shaders){
     let canvas = document.getElementById("gl-canvas");
@@ -78,28 +89,32 @@ function setup(shaders){
                 mode = gl.TRIANGLES;
                 break;
             case 'w':
-                //subir cano do tanque
+                if(MAX_BARREL_DEGREE > barrelDegre+BARREL_MOV)
+                barrelDegre += BARREL_MOV;
+                else barrelDegre = 180;
             break;
             case 's':
-                //descer cano do tanque
+                if(MIN_BARREL_DEGREE < barrelDegre-BARREL_MOV)
+                barrelDegre -= BARREL_MOV;
+                else barrelDegre = 0;
             break;
             case 'a':
-                //rodar cano para a esquerda
+                turretDegre += TURRET_MOV; 
             break;
             case 'd':
-                //rodar cano para a direita
+                turretDegre -= TURRET_MOV; 
             break;
             case 'SPACE':
                 //Dispara um projetil, devendo o mesmo sair pela extremidade do cano, na direção por este apontada
             break;
             case 'ArrowUp':
-                if(mov <= (FLOOR_CUBES/2 - 4) ){
+                if(mov <= (CENTER - 4) ){
                     mov += TANK_MOVE;
                     rot += (1 * (TANK_MOVE / 1) * (180 / PI));
                 }
             break;
             case 'ArrowDown':
-                if(mov >= -(FLOOR_CUBES/2 - 3) ){
+                if(mov >= -(CENTER - 3) ){
                     mov -= TANK_MOVE;
                     rot += (-1 * (TANK_MOVE / 1) * (180 / PI));
                 }
@@ -201,17 +216,105 @@ function setup(shaders){
             hull();
         popMatrix();
         pushMatrix();
-            turret();
-        popMatrix();
-        pushMatrix();
-            multTranslation([BARREL_WIDHT_FLOOR,BARREL_HEIGHT_FLOOR,CENTER]);
-            multRotationZ([15]);
-            barrel();
+            multTranslation([CENTER ,TURRET_BASE_HEIGHT_FLOOR, CENTER]);
+            multRotationY(turretDegre);
+            turretAndBarrel();
         popMatrix();
         pushMatrix();
             axleSet();
         popMatrix();
        
+    }
+
+    function turretAndBarrel(){
+        pushMatrix();
+            turret();
+        popMatrix();
+        multTranslation([0,BARREL_HEIGHT,0]);
+        pushMatrix();
+            multRotationZ([barrelDegre]);
+            multTranslation([BARREL_WIDHT/2,0,0]);
+            barrel();
+        popMatrix();
+        
+    }
+
+
+    function turretPopOut(){
+        multScale([TURRET_WIDHT, TURRET_HEIGHT, TURRET_DEPT]);
+
+        uploadColor(vec3(0.498,0.443,0.588));
+        uploadModelView();
+        SPHERE.draw(gl, program, mode);
+    }
+
+    function turret(){
+       
+        pushMatrix();
+            turretBase();
+        popMatrix();
+        pushMatrix();
+            turretPopOut();
+        popMatrix();
+    }
+
+    function turretBase(){
+        multScale([TURRET_BASE_WIDHT , TURRET_BASE_HEIGHT, TURRET_BASE_DEPT]);
+
+        uploadColor(vec3(0.655,0.608,0.741));
+        uploadModelView();
+        CYLINDER.draw(gl, program, mode);
+    }
+
+    function barrel(){
+        multScale([BARREL_WIDHT, BARREL_HEIGHT, BARREL_DEPT]);
+        multRotationZ([90]);
+        
+
+        uploadColor(vec3(0.655,0.608,0.741));
+        uploadModelView();
+        CYLINDER.draw(gl, program, mode);
+    }
+
+
+    
+    function hull(){
+        pushMatrix();
+            bottomHull();
+        popMatrix();
+        pushMatrix();
+            spearHull();
+        popMatrix();
+    }
+
+    function spearHull(){
+        pushMatrix();
+            multTranslation([CENTER + HULL_WIDTH/2,HULL_HEIGHT_FLOOR,CENTER]);
+            spear();
+        popMatrix();
+        pushMatrix();
+        multTranslation([CENTER - HULL_WIDTH/2,HULL_HEIGHT_FLOOR,CENTER]);
+            spear();
+        popMatrix();
+    }
+
+    function spear(){
+        multScale([1, HULL_HEIGHT,  Math.sqrt(Math.pow(TANK_DEPT,2)/2) ]);
+        multRotationY([45]);
+
+        uploadColor(vec3(0.361,0.294,0.451));
+        uploadModelView();
+        CUBE.draw(gl, program, mode);
+    }
+
+    function bottomHull(){
+        multTranslation([CENTER,HULL_HEIGHT_FLOOR,CENTER]);
+        multScale([HULL_WIDTH, HULL_HEIGHT, TANK_DEPT]);
+        multRotationZ(180);
+
+        uploadColor(vec3(0.361,0.294,0.451));
+        uploadModelView();
+        CUBE.draw(gl, program, mode);
     }
 
 
@@ -263,26 +366,6 @@ function setup(shaders){
     }
 
 
-    function turret(){
-        multTranslation([CENTER ,TURRET_HEIGHT_FLOOR,CENTER]);
-        multScale([TURRET_WIDHT, TURRET_HEIGHT, TURRET_DEPT]);
-
-        uploadColor(vec3(0.498,0.443,0.588));
-        uploadModelView();
-        SPHERE.draw(gl, program, mode);
-        
-
-    }
-
-    function barrel(){
-        multScale([BARREL_WIDHT, BARREL_HEIGHT, BARREL_DEPT]);
-        multRotationZ([90]);
-        
-
-        uploadColor(vec3(0.655,0.608,0.741));
-        uploadModelView();
-        CYLINDER.draw(gl, program, mode);
-    }
 
     function pairWheels(){
 
@@ -325,46 +408,6 @@ function setup(shaders){
         SPHERE.draw(gl, program, mode);
     } 
 
-
-    function hull(){
-            pushMatrix();
-                bottomHull();
-            popMatrix();
-            pushMatrix();
-                spearHull();
-            popMatrix();
-    }
-
-    function spearHull(){
-        pushMatrix();
-            multTranslation([CENTER + HULL_WIDTH/2,HULL_HEIGHT_FLOOR,CENTER]);
-            spear();
-        popMatrix();
-        pushMatrix();
-        multTranslation([CENTER - HULL_WIDTH/2,HULL_HEIGHT_FLOOR,CENTER]);
-            spear();
-        popMatrix();
-    }
-
-    function spear(){
-        multScale([1, HULL_HEIGHT,  Math.sqrt(Math.pow(TANK_DEPT,2)/2) ]);
-        multRotationY([45]);
- 
-        uploadColor(vec3(0.361,0.294,0.451));
-        uploadModelView();
-        CUBE.draw(gl, program, mode);
-    }
-
-    function bottomHull(){
-        multTranslation([CENTER,HULL_HEIGHT_FLOOR,CENTER]);
-        multScale([HULL_WIDTH, HULL_HEIGHT, TANK_DEPT]);
-        multRotationZ(180);
-
-        uploadColor(vec3(0.361,0.294,0.451));
-        uploadModelView();
-        CUBE.draw(gl, program, mode);
-    }
-    
 
 
     function render(){

@@ -22,6 +22,9 @@ let zoom = 10;
 let turretDegre = 0;
 let barrelDegre = 15;
 
+
+const ZOOM = 10;
+
 const MAX_BARREL_DEGREE = 180;
 const MIN_BARREL_DEGREE = 0;
 const BARREL_MOV = 5;
@@ -139,15 +142,15 @@ function setup(shaders){
                 mView = lookAt(vec3(FLOOR_CUBES,4,FLOOR_CUBES),vec3(CENTER,0,CENTER),vec3(0,1,0));
             break;
             case '+':
-                if (zoom > 6){
-                    zoom -= 1;
+                if (zoom > 0.1){
+                    zoom -= 0.1;
                     //ortho(left, right, bottom, top, near, far)
-                    mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*zoom, 3*zoom);
+                    mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + HULL_HEIGHT_FLOOR, zoom + HULL_HEIGHT_FLOOR, -3*ZOOM, 3*ZOOM);
                 }
                 break;
             case '-':
-                zoom += 1;
-                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*zoom, 3*zoom);
+                zoom += 0.1;
+                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + HULL_HEIGHT_FLOOR, zoom + HULL_HEIGHT_FLOOR, -3*ZOOM, 3*ZOOM);
                 break;
         }
     }
@@ -171,7 +174,7 @@ function setup(shaders){
 
         gl.viewport(0,0,canvas.width, canvas.height);
 
-        mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*zoom, 3*zoom);
+        mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + HULL_HEIGHT_FLOOR, zoom + HULL_HEIGHT_FLOOR, -3*10, 3*10);
    
     }
 
@@ -325,28 +328,37 @@ function setup(shaders){
         popMatrix();
 
         pushMatrix();
-        multTranslation([TIRE_DIAMETER,0,0]);
-        wheelsAndAxle();
+            multTranslation([TIRE_DIAMETER,0,0]);
+            wheelsAndAxle();
         popMatrix();
 
         pushMatrix();
-        multTranslation([-TIRE_DIAMETER,0,0]);
-        wheelsAndAxle();
+            multTranslation([-TIRE_DIAMETER,0,0]);
+            wheelsAndAxle();
         popMatrix();
 
         pushMatrix();
-        multTranslation([2*-TIRE_DIAMETER,0,0]);
-        wheelsAndAxle();
+            multTranslation([2*-TIRE_DIAMETER,0,0]);
+            wheelsAndAxle();
         popMatrix();
 
         pushMatrix();
-        multTranslation([2*TIRE_DIAMETER,0,0]);
-        wheelsAndAxle();
+            multTranslation([2*TIRE_DIAMETER,0,0]);
+            wheelsAndAxle();
+        popMatrix();
+
+        pushMatrix();
+            multTranslation([CENTER-0.4 , TIRE_HEIGHT_FLOOR ,CENTER]);
+            multScale([TIRE_DIAMETER/6, TIRE_DIAMETER/6, TANK_DEPT]);  //((NUMBER_OF_TIRES - 2) * TIRE_DIAMETER) + 2 * (0.5 * TIRE_DIAMETER)
+            multRotationY(90);
+            axle();
         popMatrix();
     }
 
     function wheelsAndAxle(){
         pushMatrix();
+            multTranslation([CENTER , TIRE_HEIGHT_FLOOR ,CENTER]);
+            multScale([TIRE_DIAMETER/6, TIRE_DIAMETER/6, TANK_DEPT]);
             axle();
         popMatrix(); 
         pushMatrix();
@@ -357,8 +369,8 @@ function setup(shaders){
 
 
     function axle(){
-        multTranslation([CENTER , TIRE_HEIGHT_FLOOR ,CENTER]);
-        multScale([TIRE_DIAMETER/6, TIRE_DIAMETER/6, TANK_DEPT]);
+        //multTranslation([CENTER , TIRE_HEIGHT_FLOOR ,CENTER]);
+        //multScale([TIRE_DIAMETER/6, TIRE_DIAMETER/6, TANK_DEPT]);
         multRotationX(90);
 
         uploadColor(vec3(0.78,0.761,0.929));
@@ -430,7 +442,7 @@ function setup(shaders){
             floor();
         popMatrix();
         pushMatrix();
-            if(FLOOR_CUBES % 2 == 0) multTranslation([ (-FLOOR_DIAMETER/2) + mov, 0, 0]);
+            if(FLOOR_CUBES % 2 == 0) multTranslation([ (-FLOOR_DIAMETER/2) + mov, 0, (-FLOOR_DIAMETER/2)]);
             else multTranslation([0 + mov, 0, 0]);
             tank();
         popMatrix();

@@ -42,6 +42,7 @@ const TIRE_DIAMETER_SCALE = HULL_HEIGHT/2;
 const TIRE_DIAMETER = 1.4 * TIRE_DIAMETER_SCALE;
 const TIRE_HEIGHT_FLOOR = FLOOR_HEIGHT/2 + TIRE_DIAMETER/2 ;
 const TIRE_DEPT = TANK_DEPT/2;
+const NUMBER_OF_TIRES = 5;
 
 const RIM_DEPT_SCALE = TIRE_DEPT/2;
 
@@ -108,34 +109,34 @@ function setup(shaders){
                 //Dispara um projetil, devendo o mesmo sair pela extremidade do cano, na direção por este apontada
             break;
             case 'ArrowUp':
-                if(mov <= (CENTER - 4) ){
+                if(mov <= ((CENTER) - (NUMBER_OF_TIRES/2 * TIRE_DIAMETER)) ){
                     mov += TANK_MOVE;
                     rot += (1 * (TANK_MOVE / 1) * (180 / PI));
                 }
             break;
             case 'ArrowDown':
-                if(mov >= -(CENTER - 3) ){
+                if(mov >= -((CENTER) - (NUMBER_OF_TIRES/2 * TIRE_DIAMETER)) ){
                     mov -= TANK_MOVE;
                     rot += (-1 * (TANK_MOVE / 1) * (180 / PI));
                 }
             break;
             case '1':
                 //vista de frente
-                mView = lookAt(vec3(-FLOOR_CUBES/2,0,FLOOR_CUBES/2),vec3(FLOOR_CUBES/2,0,FLOOR_CUBES/2),vec3(0,1,0));
+                mView = lookAt(vec3(CENTER,0,CENTER),vec3(CENTER,0,CENTER),vec3(0,1,0));
               
                break;
             case '2':
                 //vista de cima
-                mView = lookAt(vec3(FLOOR_CUBES/2,10,FLOOR_CUBES/2),vec3(FLOOR_CUBES/2,0,FLOOR_CUBES/2),vec3(1,0,0));
+                mView = lookAt(vec3(CENTER,10,CENTER),vec3(CENTER,0,CENTER),vec3(1,0,0));
               
             break;
             case '3':
                 //vista de lado
-                mView = lookAt(vec3(FLOOR_CUBES/2,0,0),vec3(FLOOR_CUBES/2,0,FLOOR_CUBES/2),vec3(0,1,0));
+                mView = lookAt(vec3(CENTER,0,0),vec3(CENTER,0,CENTER),vec3(0,1,0));
             break;
             case '4':
                 //projecao axonometrica
-                mView = lookAt(vec3(FLOOR_CUBES,4,FLOOR_CUBES),vec3(FLOOR_CUBES/2,0,FLOOR_CUBES/2),vec3(0,1,0));
+                mView = lookAt(vec3(FLOOR_CUBES,4,FLOOR_CUBES),vec3(CENTER,0,CENTER),vec3(0,1,0));
             break;
             case '+':
                 if (zoom > 6){
@@ -429,7 +430,8 @@ function setup(shaders){
             floor();
         popMatrix();
         pushMatrix();
-            multTranslation([0 + mov,0,0]);
+            if(FLOOR_CUBES % 2 == 0) multTranslation([ (0-FLOOR_DIAMETER/2) + mov, 0, 0]);
+            else multTranslation([0 + mov, 0, 0]);
             tank();
         popMatrix();
      

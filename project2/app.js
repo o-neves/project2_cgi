@@ -142,15 +142,15 @@ function setup(shaders){
                 mView = lookAt(vec3(FLOOR_CUBES,4,FLOOR_CUBES),vec3(CENTER,0,CENTER),vec3(0,1,0));
             break;
             case '+':
-                if (zoom > 1){
-                    zoom -= 1;
+                if (zoom > 0.1){
+                    zoom -= 0.1;
                     //ortho(left, right, bottom, top, near, far)
-                    mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*ZOOM, 3*ZOOM);
+                    mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + HULL_HEIGHT_FLOOR, zoom + HULL_HEIGHT_FLOOR, -3*ZOOM, 3*ZOOM);
                 }
                 break;
             case '-':
-                zoom += 1;
-                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*ZOOM, 3*ZOOM);
+                zoom += 0.1;
+                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + HULL_HEIGHT_FLOOR, zoom + HULL_HEIGHT_FLOOR, -3*ZOOM, 3*ZOOM);
                 break;
         }
     }
@@ -174,7 +174,7 @@ function setup(shaders){
 
         gl.viewport(0,0,canvas.width, canvas.height);
 
-        mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*zoom, 3*zoom);
+        mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + HULL_HEIGHT_FLOOR, zoom + HULL_HEIGHT_FLOOR, -3*10, 3*10);
    
     }
 
@@ -442,7 +442,7 @@ function setup(shaders){
             floor();
         popMatrix();
         pushMatrix();
-            if(FLOOR_CUBES % 2 == 0) multTranslation([ (0-FLOOR_DIAMETER/2) + mov, 0, 0]);
+            if(FLOOR_CUBES % 2 == 0) multTranslation([ (0-FLOOR_DIAMETER/2) + mov, 0, (0-FLOOR_DIAMETER/2)]);
             else multTranslation([0 + mov, 0, 0]);
             tank();
         popMatrix();

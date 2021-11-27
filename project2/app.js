@@ -23,7 +23,7 @@ let zoom = 10;
 
 const PI = 3.14159265359;
 const FLOOR_DIAMETER = 1;
-const HULL_HEIGHT = 2;
+const HULL_HEIGHT = 1.5;
 const FLOOR_CUBES = 20;
 const TANK_MOVE = 0.1;
 const TANK_DEPT = 3;
@@ -31,12 +31,12 @@ const CENTER = FLOOR_CUBES/2;
 
 const FLOOR_HEIGHT = 0.5 * FLOOR_DIAMETER;
 
-const HULL_WIDTH = HULL_HEIGHT * 3.5;
+const HULL_WIDTH = HULL_HEIGHT * 4;
 
-const TIRE_DIAMETER_SCALE = HULL_HEIGHT/2.2;
+const TIRE_DIAMETER_SCALE = HULL_HEIGHT/2;
 const TIRE_DIAMETER = 1.4 * TIRE_DIAMETER_SCALE;
 const TIRE_HEIGHT_FLOOR = FLOOR_HEIGHT/2 + TIRE_DIAMETER/2 ;
-const TIRE_DEPT = TANK_DEPT/1.5;
+const TIRE_DEPT = TANK_DEPT/2;
 
 const RIM_DEPT_SCALE = TIRE_DEPT/2;
 
@@ -49,7 +49,7 @@ const TURRET_HEIGHT_FLOOR = HULL_HEIGHT_FLOOR + HULL_HEIGHT/2;
 
 const BARREL_WIDHT = TURRET_WIDHT;
 const BARREL_HEIGHT = TURRET_HEIGHT/6.5; 
-const BARREL_DEPT = TURRET_DEPT/4; 
+const BARREL_DEPT = TURRET_DEPT/6; 
 const BARREL_WIDHT_FLOOR = CENTER+TURRET_WIDHT/2;
 const BARREL_HEIGHT_FLOOR = HULL_HEIGHT_FLOOR + HULL_HEIGHT/1.1; 
 
@@ -257,7 +257,7 @@ function setup(shaders){
         multScale([TIRE_DIAMETER/6, TIRE_DIAMETER/6, TANK_DEPT]);
         multRotationX(90);
 
-        uploadColor(vec3(0,0,0.88));
+        uploadColor(vec3(0.78,0.761,0.929));
         uploadModelView();
         CYLINDER.draw(gl, program, mode);
     }
@@ -267,7 +267,7 @@ function setup(shaders){
         multTranslation([CENTER ,TURRET_HEIGHT_FLOOR,CENTER]);
         multScale([TURRET_WIDHT, TURRET_HEIGHT, TURRET_DEPT]);
 
-        uploadColor(vec3(0.808,0.616,0.851));
+        uploadColor(vec3(0.498,0.443,0.588));
         uploadModelView();
         SPHERE.draw(gl, program, mode);
         
@@ -279,7 +279,7 @@ function setup(shaders){
         multRotationZ([90]);
         
 
-        uploadColor(vec3(1,0.616,0.851));
+        uploadColor(vec3(0.655,0.608,0.741));
         uploadModelView();
         CYLINDER.draw(gl, program, mode);
     }
@@ -318,6 +318,7 @@ function setup(shaders){
     function rim(){  
 
         multScale([TIRE_DIAMETER_SCALE,TIRE_DIAMETER_SCALE,RIM_DEPT_SCALE]);
+        multRotationZ(rot);
 
         uploadColor(vec3(1,1,1));
         uploadModelView();
@@ -329,9 +330,29 @@ function setup(shaders){
             pushMatrix();
                 bottomHull();
             popMatrix();
-            /*pushMatrix();
+            pushMatrix();
                 spearHull();
-            popMatrix();*/
+            popMatrix();
+    }
+
+    function spearHull(){
+        pushMatrix();
+            multTranslation([CENTER + HULL_WIDTH/2,HULL_HEIGHT_FLOOR,CENTER]);
+            spear();
+        popMatrix();
+        pushMatrix();
+        multTranslation([CENTER - HULL_WIDTH/2,HULL_HEIGHT_FLOOR,CENTER]);
+            spear();
+        popMatrix();
+    }
+
+    function spear(){
+        multScale([1, HULL_HEIGHT,  Math.sqrt(Math.pow(TANK_DEPT,2)/2) ]);
+        multRotationY([45]);
+ 
+        uploadColor(vec3(0.361,0.294,0.451));
+        uploadModelView();
+        CUBE.draw(gl, program, mode);
     }
 
     function bottomHull(){
@@ -339,35 +360,11 @@ function setup(shaders){
         multScale([HULL_WIDTH, HULL_HEIGHT, TANK_DEPT]);
         multRotationZ(180);
 
-        uploadColor(vec3(0.467,0.62,0.796));
+        uploadColor(vec3(0.361,0.294,0.451));
         uploadModelView();
         CUBE.draw(gl, program, mode);
     }
-
-    function spearHull(){
-
-     /*   pushMatrix();
-            multTranslation([FLOOR_CUBES/2-4,HULL_HEIGHT_FLOOR,FLOOR_CUBES/2]);
-            multScale([1, HULL_HEIGHT, 2]);
-            multRotationZ(90);
-            spear();
-        popMatrix();
-        pushMatrix();
-            multTranslation([FLOOR_CUBES/2+4,HULL_HEIGHT_FLOOR,FLOOR_CUBES/2]);
-            multScale([1, HULL_HEIGHT, 2]);
-            multRotationZ(-90);
-            spear();
-        popMatrix();
-    */
-    }
-
-    function spear(){
-       //multRotationX([]);
-
-        uploadColor(vec3(0.467,0.62,0.796));
-        uploadModelView();
-        CUBE.draw(gl, program, mode);
-    }
+    
 
 
     function render(){
@@ -383,6 +380,7 @@ function setup(shaders){
 
         loadMatrix(mView);
 
+        //meter constante e maybe mandar já tudo para o meio
         multTranslation([0.5,0,0.5]);
         pushMatrix();
             floor();

@@ -430,7 +430,7 @@ function setup(shaders){
             floor();
         popMatrix();
         pushMatrix();
-            if(FLOOR_CUBES % 2 == 0) multTranslation([ (0-FLOOR_DIAMETER/2) + mov, 0, 0]);
+            if(FLOOR_CUBES % 2 == 0) multTranslation([ (-FLOOR_DIAMETER/2) + mov, 0, 0]);
             else multTranslation([0 + mov, 0, 0]);
             tank();
         popMatrix();

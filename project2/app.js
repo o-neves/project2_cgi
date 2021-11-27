@@ -26,7 +26,7 @@ const FLOOR_DIAMETER = 1;
 const HULL_HEIGHT = 1.5;
 const FLOOR_CUBES = 20;
 const TANK_MOVE = 0.1;
-const TANK_DEPT = 3;
+const TANK_DEPT = HULL_HEIGHT * 2;
 const CENTER = FLOOR_CUBES/2;
 
 const FLOOR_HEIGHT = 0.5 * FLOOR_DIAMETER;

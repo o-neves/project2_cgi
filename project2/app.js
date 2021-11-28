@@ -28,6 +28,7 @@ let fired = false;
 let center_of_the_tank = 0;
 let projetilesfires = [];
 
+
 const FRAME_RATE = 1/60;
 const gravity = vec4(0,-9.8,0,0);
 
@@ -65,7 +66,7 @@ const NUMBER_OF_TIRES = 5;
 const RIM_DEPT_SCALE = TIRE_DEPT/2;
 
 const HULL_HEIGHT_FLOOR = TIRE_HEIGHT_FLOOR + HULL_HEIGHT/2;
-const CENTER_ZOOM = HULL_HEIGHT_FLOOR / (ZOOM/0.1);
+const CENTER_ZOOM = (HULL_HEIGHT_FLOOR + FLOOR_HEIGHT) / (ZOOM/0.1);
 
 const TURRET_WIDHT = HULL_WIDTH/2;
 const TURRET_HEIGHT = HULL_HEIGHT*1.1;
@@ -81,6 +82,12 @@ const TURRET_BASE_WIDHT = TURRET_WIDHT*1.1;
 const TURRET_BASE_HEIGHT = TURRET_HEIGHT*0.1;
 const TURRET_BASE_DEPT= TURRET_DEPT*1.1;
 const TURRET_BASE_HEIGHT_FLOOR = TURRET_HEIGHT_FLOOR + TURRET_BASE_HEIGHT/2;
+
+const WHEELS_DEGREE = (1 * (TANK_MOVE / 1) * (180 / Math.PI));
+
+
+const MOVEMENT_LIMITE = ((CENTER) - (NUMBER_OF_TIRES/2 * TIRE_DIAMETER));
+
 
 //ver se dá para melhorar
 const MIDDLE_AXEL_WIDTH = (WHEELS_PER_SIDE * TIRE_DIAMETER)/(TANK_DEPT*1.2);
@@ -113,12 +120,12 @@ function setup(shaders){
             case 'w':
                 if(MAX_BARREL_DEGREE > barrelDegre+BARREL_MOV)
                 barrelDegre += BARREL_MOV;
-                else barrelDegre = 180;
+                else barrelDegre = MAX_BARREL_DEGREE;
             break;
             case 's':
                 if(MIN_BARREL_DEGREE < barrelDegre-BARREL_MOV)
                 barrelDegre -= BARREL_MOV;
-                else barrelDegre = 0;
+                else barrelDegre = MIN_BARREL_DEGREE;
             break;
             case 'a':
                 turretDegre += TURRET_MOV; 
@@ -133,21 +140,21 @@ function setup(shaders){
                 
                 break;
             case 'ArrowUp':
-                if(movTank <= ((CENTER) - (NUMBER_OF_TIRES/2 * TIRE_DIAMETER)) ){
+                if(movTank <= MOVEMENT_LIMITE ){
                     movTank += TANK_MOVE;
-                    rotWheels += (1 * (TANK_MOVE / 1) * (180 / Math.PI));
+                    rotWheels += WHEELS_DEGREE;
                 }
             break;
             case 'ArrowDown':
-                if(movTank >= -((CENTER) - (NUMBER_OF_TIRES/2 * TIRE_DIAMETER)) ){
+                if(movTank >= -MOVEMENT_LIMITE){
                     movTank -= TANK_MOVE;
-                    rotWheels += (-1 * (TANK_MOVE / 1) * (180 / Math.PI));
+                    rotWheels -= WHEELS_DEGREE;
                 }
             break;
             case '1':
                 //vista de frente
-                mView = lookAt(vec3(-CENTER,0,CENTER),vec3(CENTER,0,CENTER),vec3(0,1,0));
-              
+                mView = lookAt(vec3(CENTER,0,0),vec3(CENTER,0,CENTER),vec3(0,1,0));
+                
                break;
             case '2':
                 //vista de cima
@@ -156,31 +163,25 @@ function setup(shaders){
             break;
             case '3':
                 //vista de lado
-                mView = lookAt(vec3(CENTER,0,0),vec3(CENTER,0,CENTER),vec3(0,1,0));
+                mView = lookAt(vec3(-CENTER,0,CENTER),vec3(CENTER,0,CENTER),vec3(0,1,0));
             break;
             case '4':
                 //projecao axonometrica
                 mView = lookAt(vec3(FLOOR_CUBES,4,FLOOR_CUBES),vec3(CENTER,0,CENTER),vec3(0,1,0));
             break;
             case '+':
-                //Parar no 0.1 ou 0?
                 if (zoom - ZOOM_CHANGE > 0.1){
                     zoom -= ZOOM_CHANGE;
-
-                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*CENTER, 3*CENTER);
-           
-                    /*
-                if(center_of_the_tank < HULL_HEIGHT_FLOOR) center_of_the_tank += CENTER_ZOOM;
-                //ortho(left, right, bottom, top, near, far)
+                
+                //adicionar constantes
+                if(center_of_the_tank < HULL_HEIGHT_FLOOR+ FLOOR_HEIGHT/2) center_of_the_tank += CENTER_ZOOM;
                 mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + center_of_the_tank, zoom + center_of_the_tank, 3*-CENTER, 3*CENTER);
-                */}
+                }
             break;
             case '-':      
                 zoom += 0.1;
-                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*CENTER, 3*CENTER);
-           
-                /*if(center_of_the_tank > CENTER_ZOOM) center_of_the_tank -= CENTER_ZOOM;
-                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + center_of_the_tank, zoom + center_of_the_tank, -3*ZOOM, 3*ZOOM);*/
+                if(center_of_the_tank > CENTER_ZOOM) center_of_the_tank -= CENTER_ZOOM;
+                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + center_of_the_tank, zoom + center_of_the_tank, -3*CENTER, 3*CENTER);
             break;
         }
     }

@@ -25,6 +25,7 @@ let barrelDegre = 15;
 let lastMV = mat4();
 let time = 0;
 let fired = false;
+let center_of_the_tank = 0;
 
 const FRAME_RATE = 1/60;
 
@@ -56,6 +57,7 @@ const NUMBER_OF_TIRES = 5;
 const RIM_DEPT_SCALE = TIRE_DEPT/2;
 
 const HULL_HEIGHT_FLOOR = TIRE_HEIGHT_FLOOR + HULL_HEIGHT/2;
+const CENTER_ZOOM = HULL_HEIGHT_FLOOR / (ZOOM/0.1);
 
 const TURRET_WIDHT = HULL_WIDTH/2;
 const TURRET_HEIGHT = HULL_HEIGHT*1.1;
@@ -155,12 +157,18 @@ function setup(shaders){
                 if (zoom - ZOOM_CHANGE > 0){
                     zoom -= ZOOM_CHANGE;
                     //ortho(left, right, bottom, top, near, far)
-                    mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + HULL_HEIGHT_FLOOR, zoom + HULL_HEIGHT_FLOOR, -3*ZOOM, 3*ZOOM);
+                    mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + center_of_the_tank, zoom + center_of_the_tank, -3*ZOOM, 3*ZOOM);
                 }
                 break;
             case '-':
+
+              /*
                 zoom += ZOOM_CHANGE;
-                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + HULL_HEIGHT_FLOOR, zoom + HULL_HEIGHT_FLOOR, -3*ZOOM, 3*ZOOM);
+                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + HULL_HEIGHT_FLOOR, zoom + HULL_HEIGHT_FLOOR, -3*ZOOM, 3*ZOOM);    */
+          
+                zoom += 0.1;
+                if(center_of_the_tank > CENTER_ZOOM) center_of_the_tank -= CENTER_ZOOM;
+                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + center_of_the_tank, zoom + center_of_the_tank, -3*ZOOM, 3*ZOOM);
                 break;
         }
     }
@@ -184,7 +192,8 @@ function setup(shaders){
 
         gl.viewport(0,0,canvas.width, canvas.height);
 
-        mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + HULL_HEIGHT_FLOOR, zoom + HULL_HEIGHT_FLOOR, -3*10, 3*10);
+        //mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + HULL_HEIGHT_FLOOR, zoom + HULL_HEIGHT_FLOOR, -3*ZOOM, 3*ZOOM);
+        mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*ZOOM, 3*ZOOM);
    
     }
 

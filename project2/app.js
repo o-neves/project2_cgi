@@ -152,7 +152,8 @@ function setup(shaders){
                 //projecao axonometrica
                 mView = lookAt(vec3(FLOOR_CUBES,4,FLOOR_CUBES),vec3(CENTER,0,CENTER),vec3(0,1,0));
             break;
-                            //Parar no 0.1 ou 0?
+            case '+':
+                //Parar no 0.1 ou 0?
                 if (zoom - ZOOM_CHANGE > 0.1){
                     zoom -= ZOOM_CHANGE;
                 if(center_of_the_tank < HULL_HEIGHT_FLOOR) center_of_the_tank += CENTER_ZOOM;

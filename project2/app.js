@@ -26,8 +26,10 @@ let lastMV = mat4();
 let time = 0;
 let fired = false;
 let center_of_the_tank = 0;
+let projetilesfires = [];
 
 const FRAME_RATE = 1/60;
+const gravity = vec4(0,-9.8,0,0);
 
 const ZOOM = 10;
 const ZOOM_CHANGE = 0.1;
@@ -127,6 +129,8 @@ function setup(shaders){
             case ' ':
                 //Dispara um projetil, devendo o mesmo sair pela extremidade do cano, na direção por este apontada
                 fired = true;
+                projetilesfires.push([0,lastMV]);
+                
                 break;
             case 'ArrowUp':
                 if(mov <= ((CENTER) - (NUMBER_OF_TIRES/2 * TIRE_DIAMETER)) ){
@@ -521,7 +525,46 @@ function setup(shaders){
 
     function fireProjetile(){
 
-        time += FRAME_RATE;
+        
+
+        for(let i = 0; i < projetilesfires.length; i++){
+
+            if(projetilesfires[i][0] == 0)
+            projetilesfires[i][1] = lastMV;
+
+            projetilesfires[i][0] += FRAME_RATE;
+            time = projetilesfires[i][0];
+
+            //obter WC
+            let WC = mult(inverse(mView),projetilesfires[i][1]);
+
+            let x0 = mult(WC,vec4(0,0,0,1));
+            
+            //speed = 5
+            let v0 = mult(normalMatrix(WC),vec4(0,5,0,0));
+
+
+            let x = add(x0, add(scale(time,v0),scale(0.5*time*time,gravity)));
+
+            if(x[1] <= 0){
+                if(projetilesfires.length-1 == i)
+                fired = false;
+                projetilesfires.splice(i,1);
+            }
+
+            pushMatrix();
+                
+                multTranslation([x[0], x[1], x[2]]);
+                multScale([BARREL_HEIGHT,BARREL_HEIGHT,BARREL_DEPT]);
+                
+                projetile();
+            popMatrix();
+
+        }
+
+
+
+        /*time += FRAME_RATE;
 
         //obter WC
         let WC = mult(inverse(mView),lastMV);
@@ -529,13 +572,12 @@ function setup(shaders){
         let x0 = mult(WC,vec4(0,0,0,1));
 
         //speed = 1
-        let v0 = mult(normalMatrix(WC),vec4(0,1,0,0));
+        let v0 = mult(normalMatrix(WC),vec4(0,5,0,0));
 
-        //x = x0 + v0*time + (9,8*0.5)*time*time;
-        let gravity = vec4(0,-9.8,0,0);
-      
         let x = add(x0, add(scale(time,v0),scale(0.5*time*time,gravity)));
-        console.log(x);
+
+
+
 
         if(x[1] <= 0)
         fired = false;
@@ -548,6 +590,7 @@ function setup(shaders){
             projetile();
         popMatrix();
 
+        */
     }
 
 
@@ -566,7 +609,7 @@ function setup(shaders){
 
         loadMatrix(mView);
 
-        //meter constante e maybe mandar já tudo para o meio
+        //meter constantes
         
             pushMatrix();
                 multTranslation([FLOOR_HEIGHT,0,FLOOR_HEIGHT]);

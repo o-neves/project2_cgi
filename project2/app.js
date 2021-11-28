@@ -25,7 +25,7 @@ let barrelDegree = 15;
 let lastMV = mat4();
 let stillFiring = false;
 let center_of_the_tank = 0;
-let projetilesfires = [];
+let projetilesfired = [];
 
 
 const OFFSET = 0.001;
@@ -143,7 +143,7 @@ function setup(shaders){
             case ' ':
                 //Dispara um projetil, devendo o mesmo sair pela extremidade do cano, na direção por este apontada
                 stillFiring = true;
-                projetilesfires.push([0,lastMV]);
+                projetilesfired.push([0,lastMV]);
                 
                 break;
             case 'ArrowUp':
@@ -537,9 +537,9 @@ function setup(shaders){
 
     function fireProjetile(){
 
-        for(let i = 0; i < projetilesfires.length; i++){
+        for(let i = 0; i < projetilesfired.length; i++){
 
-            if(projetilesfires[i][0] == 0){
+            if(projetilesfired[i][0] == 0){
             //projetilesfires[i][1] = lastMV;
 
             //obter WC
@@ -547,17 +547,17 @@ function setup(shaders){
             
             //xo
             let x0 = mult(WC,vec4(0,0,0,1));
-            projetilesfires[i].push(x0);
+            projetilesfired[i].push(x0);
 
             //v0
             let v0 = mult(normalMatrix(WC),vec4(0,5,0,0))
-            projetilesfires[i].push(v0);
+            projetilesfired[i].push(v0);
 
             }
             
-            let time = projetilesfires[i][0];
+            let time = projetilesfired[i][0];
 
-            let x = add(projetilesfires[i][2], add(scale(time,projetilesfires[i][3]),scale(0.5*time*time,GRAVITY)));
+            let x = add(projetilesfired[i][2], add(scale(time,projetilesfired[i][3]),scale(0.5*time*time,GRAVITY)));
 
             pushMatrix();
                 
@@ -567,12 +567,12 @@ function setup(shaders){
                 projetile();
             popMatrix();
 
-            projetilesfires[i][0] += FRAME_RATE; 
+            projetilesfired[i][0] += FRAME_RATE; 
 
             if(x[1] <= 0){
-                if(projetilesfires.length-1 == i)
+                if(projetilesfired.length-1 == i)
                     stillFiring = false;
-                projetilesfires.splice(i,1);
+                projetilesfired.splice(i,1);
             }
             
 

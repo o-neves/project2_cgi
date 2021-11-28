@@ -308,8 +308,6 @@ function setup(shaders){
     
     function barrel(){
         multRotationZ(90);
-        multScale([BARREL_HEIGHT,BARREL_WIDHT,BARREL_DEPT]);
-
         pushMatrix();
             barrelPipe();
         popMatrix();
@@ -317,24 +315,33 @@ function setup(shaders){
             barrelTip();
         popMatrix();
 
-        lastMV = modelView();
+        
+    }
+
+    function barrelPipe(){
+
+        multScale([BARREL_HEIGHT,BARREL_WIDHT,BARREL_DEPT]);
 
         uploadColor(vec3(0.655,0.608,0.741));
         uploadModelView();
         CYLINDER.draw(gl, program, mode);
+
     }
+
 
     //ver
     function barrelTip(){
-        multTranslation([BARREL_WIDHT-(BARREL_WIDHT*0.5), 0 , 0]);
-        multRotationZ([-90]);
-        multScale([BARREL_HEIGHT + (BARREL_HEIGHT*0.25), BARREL_WIDHT/4, BARREL_HEIGHT + (BARREL_HEIGHT*0.25)]);
+        //criar constantes  
+
+        multTranslation([0, -BARREL_WIDHT/2 , 0]); 
+        multScale([BARREL_HEIGHT*1.4, BARREL_WIDHT/5, BARREL_DEPT*1.1]);
 
         lastMV = modelView();
 
         uploadColor(vec3(0.498,0.443,0.588));
         uploadModelView();
         CYLINDER.draw(gl, program, mode);
+
     }
 
     //hull

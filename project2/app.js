@@ -285,12 +285,37 @@ function setup(shaders){
     }
 
     function barrel(){
-        multScale([BARREL_WIDHT, BARREL_HEIGHT, BARREL_DEPT]);
-        multRotationZ([-90]);
-        lastMV = modelView();
         
+        pushMatrix();
+            barrelPipe();
+        popMatrix();
+        pushMatrix();
+            barrelTip();
+        popMatrix();
+
+    }
+
+
+    function barrelPipe(){
+        multRotationZ([-90]);
+        multScale([BARREL_HEIGHT, BARREL_WIDHT, BARREL_HEIGHT]);
+
+        lastMV = modelView();
 
         uploadColor(vec3(0.655,0.608,0.741));
+        uploadModelView();
+        CYLINDER.draw(gl, program, mode);
+    }
+
+
+    function barrelTip(){
+        multTranslation([BARREL_WIDHT-(BARREL_WIDHT*0.5), 0 , 0]);
+        multRotationZ([-90]);
+        multScale([BARREL_HEIGHT + (BARREL_HEIGHT*0.25), BARREL_WIDHT/4, BARREL_HEIGHT + (BARREL_HEIGHT*0.25)]);
+
+        lastMV = modelView();
+
+        uploadColor(vec3(0.498,0.443,0.588));
         uploadModelView();
         CYLINDER.draw(gl, program, mode);
     }

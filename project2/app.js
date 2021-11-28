@@ -53,6 +53,7 @@ const SPEAR_WIDTH = Math.sqrt(Math.pow(TANK_DEPT,2)/2);
 
 const TIRE_DIAMETER_SCALE = HULL_HEIGHT*0.5;
 const TIRE_DIAMETER = 1.4 * TIRE_DIAMETER_SCALE;
+
 //sera que uso
 const TIRE_HEIGHT_FLOOR =  TIRE_DIAMETER/2 ;
 

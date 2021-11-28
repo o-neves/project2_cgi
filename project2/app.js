@@ -449,7 +449,7 @@ function setup(shaders){
     }
 
 
-    function a(){
+    function fireProjetile(){
 
         time += FRAME_RATE;
 
@@ -462,8 +462,7 @@ function setup(shaders){
 
         //x = x0 + v0*time + (9,8*0.5)*time*time;
         let gravity = vec4(0,-9.8,0,0);
-        //console.log(v0);
-        //console.log(gravity);
+      
         let x = add(x0, add(scale(time,v0),scale(0.5*time*time,gravity)));
         console.log(x);
 
@@ -506,13 +505,10 @@ function setup(shaders){
             pushMatrix();
                 tank();
             popMatrix();
-
-            
-
             pushMatrix();
                 if(fired){
 
-                    a();
+                    fireProjetile();
                 }
                
                

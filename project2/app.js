@@ -152,19 +152,21 @@ function setup(shaders){
                 //projecao axonometrica
                 mView = lookAt(vec3(FLOOR_CUBES,4,FLOOR_CUBES),vec3(CENTER,0,CENTER),vec3(0,1,0));
             break;
-            case '+':
+                            //Parar no 0.1 ou 0?
                 if (zoom - ZOOM_CHANGE > 0.1){
                     zoom -= ZOOM_CHANGE;
-                    if(center_of_the_tank < HULL_HEIGHT_FLOOR) center_of_the_tank += CENTER_ZOOM;
-                    //ortho(left, right, bottom, top, near, far)
-                    mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + center_of_the_tank, zoom + center_of_the_tank, -3*ZOOM, 3*ZOOM);
+                if(center_of_the_tank < HULL_HEIGHT_FLOOR) center_of_the_tank += CENTER_ZOOM;
+                //ortho(left, right, bottom, top, near, far)
+                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + center_of_the_tank, zoom + center_of_the_tank, -3*ZOOM, 3*ZOOM);
                 }
-                break;
+            break;
             case '-':
+                
+                              
                 zoom += 0.1;
                 if(center_of_the_tank > CENTER_ZOOM) center_of_the_tank -= CENTER_ZOOM;
                 mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + center_of_the_tank, zoom + center_of_the_tank, -3*ZOOM, 3*ZOOM);
-                break;
+            break;
         }
     }
 
@@ -459,13 +461,13 @@ function setup(shaders){
         let gravity = vec4(0,-9.8,0,0);
       
         let x = add(x0, add(scale(time,v0),scale(0.5*time*time,gravity)));
-        console.log(x);
+        //console.log(x);
 
         if(x[1] <= 0)
         fired = false;
 
         pushMatrix();
-            multTranslation([0,0, 0]);
+            //multTranslation([0,0, 0]);
             multTranslation([x[0], x[1], x[2]]);
             multScale([BARREL_HEIGHT,BARREL_HEIGHT,BARREL_DEPT]);
             //multScale([5,5,5]);

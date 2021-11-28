@@ -1,5 +1,5 @@
 import { buildProgramFromSources, loadShadersFromURLS, setupWebGL } from "../../../libs/utils.js";
-import { ortho, lookAt, flatten, vec3 } from "../../../libs/MV.js";
+import { ortho, lookAt, flatten, vec3, mult,add, scale} from "../../../libs/MV.js";
 import {modelView, loadMatrix, multRotationY, multRotationX, multScale, multTranslation, popMatrix, pushMatrix, multRotationZ} from "../../../libs/stack.js";
 
 import * as SPHERE from '../../../libs/sphere.js';
@@ -7,6 +7,7 @@ import * as CUBE from '../../../libs/cube.js';
 import * as TORUS from '../../../libs/torus.js';
 import * as PYRAMID from '../../../libs/pyramid.js';
 import * as CYLINDER from '../../../libs/cylinder.js';
+import { inverse, mat4, normalMatrix, vec4 } from "../libs/MV.js";
 
 /** @type WebGLRenderingContext */
 let gl;
@@ -21,9 +22,14 @@ let rot = 0;
 let zoom = 10;
 let turretDegre = 0;
 let barrelDegre = 15;
+let lastMV = mat4();
+let time = 0;
+let fired = false;
 
+const FRAME_RATE = 1/60;
 
 const ZOOM = 10;
+const ZOOM_CHANGE = 0.1;
 
 const MAX_BARREL_DEGREE = 180;
 const MIN_BARREL_DEGREE = 0;
@@ -79,8 +85,8 @@ function setup(shaders){
     let program = buildProgramFromSources(gl, shaders["shader.vert"], shaders["shader.frag"]);
 
 
-    mView = lookAt(vec3(FLOOR_CUBES,4,FLOOR_CUBES),vec3(CENTER,0,CENTER),vec3(0,1,0));
-    mode = gl.LINES;
+    mView = lookAt(vec3(CENTER,0,0),vec3(CENTER,0,CENTER),vec3(0,1,0));
+    mode = gl.TRIANGLES;
 
 
     resize_canvas();
@@ -110,9 +116,10 @@ function setup(shaders){
             case 'd':
                 turretDegre -= TURRET_MOV; 
             break;
-            case 'SPACE':
+            case ' ':
                 //Dispara um projetil, devendo o mesmo sair pela extremidade do cano, na direção por este apontada
-            break;
+                fired = true;
+                break;
             case 'ArrowUp':
                 if(mov <= ((CENTER) - (NUMBER_OF_TIRES/2 * TIRE_DIAMETER)) ){
                     mov += TANK_MOVE;
@@ -144,14 +151,15 @@ function setup(shaders){
                 mView = lookAt(vec3(FLOOR_CUBES,4,FLOOR_CUBES),vec3(CENTER,0,CENTER),vec3(0,1,0));
             break;
             case '+':
-                if (zoom > 0.1){
-                    zoom -= 0.1;
+                //Parar no 0.1 ou 0?
+                if (zoom - ZOOM_CHANGE > 0){
+                    zoom -= ZOOM_CHANGE;
                     //ortho(left, right, bottom, top, near, far)
                     mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + HULL_HEIGHT_FLOOR, zoom + HULL_HEIGHT_FLOOR, -3*ZOOM, 3*ZOOM);
                 }
                 break;
             case '-':
-                zoom += 0.1;
+                zoom += ZOOM_CHANGE;
                 mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + HULL_HEIGHT_FLOOR, zoom + HULL_HEIGHT_FLOOR, -3*ZOOM, 3*ZOOM);
                 break;
         }
@@ -238,7 +246,7 @@ function setup(shaders){
         popMatrix();
         multTranslation([0,BARREL_HEIGHT,0]);
         pushMatrix();
-            multRotationZ([barrelDegre]);
+            multRotationZ(barrelDegre);
             multTranslation([BARREL_WIDHT/2,0,0]);
             barrel();
         popMatrix();
@@ -274,14 +282,14 @@ function setup(shaders){
 
     function barrel(){
         multScale([BARREL_WIDHT, BARREL_HEIGHT, BARREL_DEPT]);
-        multRotationZ([90]);
+        multRotationZ([-90]);
+        lastMV = modelView();
         
 
         uploadColor(vec3(0.655,0.608,0.741));
         uploadModelView();
         CYLINDER.draw(gl, program, mode);
     }
-
 
     
     function hull(){
@@ -299,7 +307,7 @@ function setup(shaders){
             spear();
         popMatrix();
         pushMatrix();
-        multTranslation([CENTER - HULL_WIDTH/2,HULL_HEIGHT_FLOOR,CENTER]);
+            multTranslation([CENTER - HULL_WIDTH/2,HULL_HEIGHT_FLOOR,CENTER]);
             spear();
         popMatrix();
     }
@@ -322,6 +330,7 @@ function setup(shaders){
         uploadModelView();
         CUBE.draw(gl, program, mode);
     }
+
 
 
     function axleSet(){
@@ -422,6 +431,47 @@ function setup(shaders){
         SPHERE.draw(gl, program, mode);
     } 
 
+    function projetile(){
+
+        uploadColor(vec3(1,1,1));
+        uploadModelView();
+        SPHERE.draw(gl, program, mode);
+        
+    }
+
+
+    function a(){
+
+        time += FRAME_RATE;
+
+        //obter WC
+        let WC = mult(inverse(mView),lastMV);
+
+        let x0 = mult(WC,vec4(0,0,0,1));
+        //speed = 10
+        let v0 = mult(normalMatrix(WC),vec4(0,3,0,0));
+
+        //x = x0 + v0*time + (9,8*0.5)*time*time;
+        let gravity = vec4(0,-9.8,0,0);
+        //console.log(v0);
+        //console.log(gravity);
+        let x = add(x0, add(scale(time,v0),scale(0.5*time*time,gravity)));
+        console.log(x);
+
+        if(x[1] <= 0)
+        fired = false;
+
+        pushMatrix();
+            multTranslation([0,0, 0]);
+            multTranslation([x[0], x[1], x[2]]);
+            multScale([BARREL_HEIGHT,BARREL_HEIGHT,BARREL_DEPT]);
+            //multScale([5,5,5]);
+            projetile();
+        popMatrix();
+
+    }
+
+
 
 
     function render(){
@@ -438,16 +488,25 @@ function setup(shaders){
         loadMatrix(mView);
 
         //meter constante e maybe mandar já tudo para o meio
-        multTranslation([0.5,0,0.5]);
-        pushMatrix();
-            floor();
-        popMatrix();
-        pushMatrix();
-            if(FLOOR_CUBES % 2 == 0) multTranslation([ (-FLOOR_DIAMETER/2) + mov, 0, (-FLOOR_DIAMETER/2)]);
-            else multTranslation([0 + mov, 0, 0]);
-            tank();
-        popMatrix();
-     
+        
+            pushMatrix();
+                multTranslation([FLOOR_HEIGHT,0,FLOOR_HEIGHT]);
+                floor();
+            popMatrix();
+            
+            pushMatrix();
+                tank();
+            popMatrix();
+
+            
+
+            pushMatrix();
+                if(fired){
+
+                    a();
+                }
+               
+               
     
     }
 }

@@ -37,7 +37,6 @@ const MAX_BARREL_DEGREE = 180;
 const MIN_BARREL_DEGREE = 0;
 const BARREL_MOV = 5;
 const TURRET_MOV = 5;
-const PI = 3.14159265359;
 const FLOOR_DIAMETER = 1;
 const HULL_HEIGHT = 1.5;
 const FLOOR_CUBES = 20;
@@ -131,13 +130,13 @@ function setup(shaders){
             case 'ArrowUp':
                 if(mov <= ((CENTER) - (NUMBER_OF_TIRES/2 * TIRE_DIAMETER)) ){
                     mov += TANK_MOVE;
-                    rot += (1 * (TANK_MOVE / 1) * (180 / PI));
+                    rot += (1 * (TANK_MOVE / 1) * (180 / Math.PI));
                 }
             break;
             case 'ArrowDown':
                 if(mov >= -((CENTER) - (NUMBER_OF_TIRES/2 * TIRE_DIAMETER)) ){
                     mov -= TANK_MOVE;
-                    rot += (-1 * (TANK_MOVE / 1) * (180 / PI));
+                    rot += (-1 * (TANK_MOVE / 1) * (180 / Math.PI));
                 }
             break;
             case '1':
@@ -307,7 +306,7 @@ function setup(shaders){
 
     
     function barrel(){
-        multRotationZ(90);
+        
         pushMatrix();
             barrelPipe();
         popMatrix();
@@ -320,6 +319,7 @@ function setup(shaders){
 
     function barrelPipe(){
 
+        multRotationZ(90);
         multScale([BARREL_HEIGHT,BARREL_WIDHT,BARREL_DEPT]);
 
         uploadColor(vec3(0.655,0.608,0.741));
@@ -332,8 +332,8 @@ function setup(shaders){
     //ver
     function barrelTip(){
         //criar constantes  
-
-        multTranslation([0, -BARREL_WIDHT/2 , 0]); 
+        multTranslation([BARREL_WIDHT/2, 0, 0]); 
+        multRotationZ(-90);
         multScale([BARREL_HEIGHT*1.4, BARREL_WIDHT/5, BARREL_DEPT*1.1]);
 
         lastMV = modelView();
@@ -527,23 +527,23 @@ function setup(shaders){
 
         let x0 = mult(WC,vec4(0,0,0,1));
 
-        //speed = 3
-        let v0 = mult(normalMatrix(WC),vec4(0,3,0,0));
+        //speed = 1
+        let v0 = mult(normalMatrix(WC),vec4(0,1,0,0));
 
         //x = x0 + v0*time + (9,8*0.5)*time*time;
         let gravity = vec4(0,-9.8,0,0);
       
         let x = add(x0, add(scale(time,v0),scale(0.5*time*time,gravity)));
-        //console.log(x);
+        console.log(x);
 
         if(x[1] <= 0)
         fired = false;
 
         pushMatrix();
-            //multTranslation([0,0, 0]);
+            
             multTranslation([x[0], x[1], x[2]]);
             multScale([BARREL_HEIGHT,BARREL_HEIGHT,BARREL_DEPT]);
-            //multScale([5,5,5]);
+            
             projetile();
         popMatrix();
 
@@ -578,7 +578,6 @@ function setup(shaders){
             popMatrix();
             pushMatrix();
                 if(fired){
-
                     fireProjetile();
                 }
                

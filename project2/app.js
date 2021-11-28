@@ -13,12 +13,12 @@ import { inverse, mat4, normalMatrix, vec4 } from "../libs/MV.js";
 let gl;
 
 
-
+//variables
 let mode;    
 let mProjection;
 let mView;
-let mov = 0.0;
-let rot = 0;
+let movTank = 0.0;
+let rotWheels = 0;
 let zoom = 10;
 let turretDegre = 0;
 let barrelDegre = 15;
@@ -133,15 +133,15 @@ function setup(shaders){
                 
                 break;
             case 'ArrowUp':
-                if(mov <= ((CENTER) - (NUMBER_OF_TIRES/2 * TIRE_DIAMETER)) ){
-                    mov += TANK_MOVE;
-                    rot += (1 * (TANK_MOVE / 1) * (180 / Math.PI));
+                if(movTank <= ((CENTER) - (NUMBER_OF_TIRES/2 * TIRE_DIAMETER)) ){
+                    movTank += TANK_MOVE;
+                    rotWheels += (1 * (TANK_MOVE / 1) * (180 / Math.PI));
                 }
             break;
             case 'ArrowDown':
-                if(mov >= -((CENTER) - (NUMBER_OF_TIRES/2 * TIRE_DIAMETER)) ){
-                    mov -= TANK_MOVE;
-                    rot += (-1 * (TANK_MOVE / 1) * (180 / Math.PI));
+                if(movTank >= -((CENTER) - (NUMBER_OF_TIRES/2 * TIRE_DIAMETER)) ){
+                    movTank -= TANK_MOVE;
+                    rotWheels += (-1 * (TANK_MOVE / 1) * (180 / Math.PI));
                 }
             break;
             case '1':
@@ -166,17 +166,21 @@ function setup(shaders){
                 //Parar no 0.1 ou 0?
                 if (zoom - ZOOM_CHANGE > 0.1){
                     zoom -= ZOOM_CHANGE;
+
+                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*CENTER, 3*CENTER);
+           
+                    /*
                 if(center_of_the_tank < HULL_HEIGHT_FLOOR) center_of_the_tank += CENTER_ZOOM;
                 //ortho(left, right, bottom, top, near, far)
-                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + center_of_the_tank, zoom + center_of_the_tank, -3*ZOOM, 3*ZOOM);
-                }
+                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + center_of_the_tank, zoom + center_of_the_tank, 3*-CENTER, 3*CENTER);
+                */}
             break;
-            case '-':
-                
-                              
+            case '-':      
                 zoom += 0.1;
-                if(center_of_the_tank > CENTER_ZOOM) center_of_the_tank -= CENTER_ZOOM;
-                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + center_of_the_tank, zoom + center_of_the_tank, -3*ZOOM, 3*ZOOM);
+                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*CENTER, 3*CENTER);
+           
+                /*if(center_of_the_tank > CENTER_ZOOM) center_of_the_tank -= CENTER_ZOOM;
+                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + center_of_the_tank, zoom + center_of_the_tank, -3*ZOOM, 3*ZOOM);*/
             break;
         }
     }
@@ -481,7 +485,7 @@ function setup(shaders){
     //wheels
     function wheel(){
         //ver se rot funciona
-        multRotationZ(rot);
+        multRotationZ(rotWheels);
         pushMatrix();
             tire();
         popMatrix();
@@ -617,7 +621,7 @@ function setup(shaders){
             popMatrix();
             
             pushMatrix();
-                multTranslation([CENTER + mov,FLOOR_HEIGHT/2,CENTER]);
+                multTranslation([CENTER + movTank,FLOOR_HEIGHT/2,CENTER]);
                 tank();
             popMatrix();
             pushMatrix();

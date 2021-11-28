@@ -153,19 +153,14 @@ function setup(shaders){
                 mView = lookAt(vec3(FLOOR_CUBES,4,FLOOR_CUBES),vec3(CENTER,0,CENTER),vec3(0,1,0));
             break;
             case '+':
-                //Parar no 0.1 ou 0?
-                if (zoom - ZOOM_CHANGE > 0){
+                if (zoom - ZOOM_CHANGE > 0.1){
                     zoom -= ZOOM_CHANGE;
+                    if(center_of_the_tank < HULL_HEIGHT_FLOOR) center_of_the_tank += CENTER_ZOOM;
                     //ortho(left, right, bottom, top, near, far)
                     mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + center_of_the_tank, zoom + center_of_the_tank, -3*ZOOM, 3*ZOOM);
                 }
                 break;
             case '-':
-
-              /*
-                zoom += ZOOM_CHANGE;
-                mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + HULL_HEIGHT_FLOOR, zoom + HULL_HEIGHT_FLOOR, -3*ZOOM, 3*ZOOM);    */
-          
                 zoom += 0.1;
                 if(center_of_the_tank > CENTER_ZOOM) center_of_the_tank -= CENTER_ZOOM;
                 mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + center_of_the_tank, zoom + center_of_the_tank, -3*ZOOM, 3*ZOOM);

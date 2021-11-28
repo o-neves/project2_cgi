@@ -23,71 +23,79 @@ let zoom = 10;
 let turretDegre = 0;
 let barrelDegre = 15;
 let lastMV = mat4();
-let time = 0;
 let fired = false;
 let center_of_the_tank = 0;
 let projetilesfires = [];
 
 
+const offset = 0.001;
 const FRAME_RATE = 1/60;
 const gravity = vec4(0,-9.8,0,0);
-
 const ZOOM = 10;
 const ZOOM_CHANGE = 0.1;
 
 
-const MAX_BARREL_DEGREE = 180;
-const MIN_BARREL_DEGREE = 0;
-const BARREL_MOV = 5;
-const TURRET_MOV = 5;
-const FLOOR_DIAMETER = 1;
-const HULL_HEIGHT = 1.5;
-const FLOOR_CUBES = 20;
-const WHEELS_PER_SIDE = 5;
-const TANK_MOVE = 0.1;
-const TANK_DEPT = HULL_HEIGHT * 2;
-const CENTER = FLOOR_CUBES/2;
 
+//floor
+const FLOOR_DIAMETER = 1;
+const FLOOR_CUBES = 20;
+const CENTER = FLOOR_CUBES/2;
 const FLOOR_HEIGHT = 0.5 * FLOOR_DIAMETER;
 
+//Hull and tank
+const HULL_HEIGHT = 1.5;
+const TANK_MOVE = 0.1;
+const TANK_DEPT = HULL_HEIGHT * 2;
 const HULL_WIDTH = HULL_HEIGHT * 4;
-
 const SPEAR_WIDTH = Math.sqrt(Math.pow(TANK_DEPT,2)/2);
 
+//Wheels, tire and rim
+const WHEELS_PER_SIDE = 5;
 const TIRE_DIAMETER_SCALE = HULL_HEIGHT*0.5;
 const TIRE_DIAMETER = 1.4 * TIRE_DIAMETER_SCALE;
-
-//sera que uso
-const TIRE_HEIGHT_FLOOR =  TIRE_DIAMETER/2 ;
-
 const TIRE_DEPT = TANK_DEPT/2;
 const NUMBER_OF_TIRES = 5;
-
 const RIM_DEPT_SCALE = TIRE_DEPT/2;
+const WHEELS_DEGREE = (1 * (TANK_MOVE / 1) * (180 / Math.PI));
+const TIRE_HEIGHT_FLOOR =  TIRE_DIAMETER/2 ;
 
+//Axel
+const AXEL_DIAMETER = TIRE_DIAMETER/6;
+
+
+//ver se dá para meter em melhor sitio
 const HULL_HEIGHT_FLOOR = TIRE_HEIGHT_FLOOR + HULL_HEIGHT/2;
-const CENTER_ZOOM = (HULL_HEIGHT_FLOOR + FLOOR_HEIGHT) / (ZOOM/0.1);
 
+
+//turret and turret base
+const TURRET_MOV = 5;
 const TURRET_WIDHT = HULL_WIDTH/2;
 const TURRET_HEIGHT = HULL_HEIGHT*1.1;
 const TURRET_DEPT = TANK_DEPT/1.5;
 const TURRET_HEIGHT_FLOOR = HULL_HEIGHT_FLOOR + HULL_HEIGHT/2;
-
-const BARREL_WIDHT = TURRET_WIDHT;
-const BARREL_HEIGHT = TURRET_HEIGHT/6.5; 
-const BARREL_DEPT = TURRET_DEPT/6; 
-
-
 const TURRET_BASE_WIDHT = TURRET_WIDHT*1.1;
 const TURRET_BASE_HEIGHT = TURRET_HEIGHT*0.1;
 const TURRET_BASE_DEPT= TURRET_DEPT*1.1;
 const TURRET_BASE_HEIGHT_FLOOR = TURRET_HEIGHT_FLOOR + TURRET_BASE_HEIGHT/2;
 
-const WHEELS_DEGREE = (1 * (TANK_MOVE / 1) * (180 / Math.PI));
 
+
+//barrel
+const MAX_BARREL_DEGREE = 180;
+const MIN_BARREL_DEGREE = 0;
+const BARREL_MOV = 5;
+const BARREL_WIDHT = TURRET_WIDHT;
+const BARREL_HEIGHT = TURRET_HEIGHT/6.5; 
+const BARREL_DEPT = TURRET_DEPT/6; 
+const BARREL_TIP_HEIGTH = BARREL_HEIGHT*1.4;
+const BARREL_TIP_WIDTH = BARREL_WIDHT/5;
+const BARREL_TIP_DEPT = BARREL_DEPT*1.1;
+
+
+
+const CENTER_ZOOM = (HULL_HEIGHT_FLOOR + FLOOR_HEIGHT) / (ZOOM/0.1);
 
 const MOVEMENT_LIMITE = ((CENTER) - (NUMBER_OF_TIRES/2 * TIRE_DIAMETER));
-
 
 //ver se dá para melhorar
 const MIDDLE_AXEL_WIDTH = (WHEELS_PER_SIDE * TIRE_DIAMETER)/(TANK_DEPT*1.2);
@@ -175,23 +183,27 @@ function setup(shaders){
                 
                 //adicionar constantes
                 if(center_of_the_tank < HULL_HEIGHT_FLOOR+ FLOOR_HEIGHT/2) center_of_the_tank += CENTER_ZOOM;
+
                 mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + center_of_the_tank, zoom + center_of_the_tank, 3*-CENTER, 3*CENTER);
                 }
             break;
             case '-':      
                 zoom += 0.1;
                 if(center_of_the_tank > CENTER_ZOOM) center_of_the_tank -= CENTER_ZOOM;
+                
                 mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + center_of_the_tank, zoom + center_of_the_tank, -3*CENTER, 3*CENTER);
             break;
         }
     }
 
     gl.clearColor(0.573,0.573,0.573, 1.0);
+
     CUBE.init(gl);
     SPHERE.init(gl);
     TORUS.init(gl);
     PYRAMID.init(gl);
     CYLINDER.init(gl);
+
     gl.enable(gl.DEPTH_TEST);   // Enables Z-buffer depth test
     
     window.requestAnimationFrame(render);
@@ -344,7 +356,7 @@ function setup(shaders){
         //criar constantes  
         multTranslation([BARREL_WIDHT/2, 0, 0]); 
         multRotationZ(-90);
-        multScale([BARREL_HEIGHT*1.4, BARREL_WIDHT/5, BARREL_DEPT*1.1]);
+        multScale([BARREL_TIP_HEIGTH,BARREL_TIP_WIDTH ,BARREL_TIP_DEPT]);
 
         lastMV = modelView();
 
@@ -383,8 +395,8 @@ function setup(shaders){
     //spear
     function spear(){
         multRotationY(45);
-        //minor offset because of shadow
-        multScale([SPEAR_WIDTH, HULL_HEIGHT - 0.001, SPEAR_WIDTH]);
+        //offset - minor offset because of shadow
+        multScale([SPEAR_WIDTH, HULL_HEIGHT - offset, SPEAR_WIDTH]);
 
         uploadColor(vec3(0.361,0.294,0.451));
         uploadModelView();
@@ -454,8 +466,7 @@ function setup(shaders){
     function axle(){
         multTranslation([0 , TIRE_HEIGHT_FLOOR ,0]);
         multRotationX(90);
-        //criar constante
-        multScale([TIRE_DIAMETER/6, TANK_DEPT, TIRE_DIAMETER/6 ]);
+        multScale([AXEL_DIAMETER, TANK_DEPT, AXEL_DIAMETER]);
 
         uploadColor(vec3(0.78,0.761,0.929));
         uploadModelView();
@@ -468,13 +479,11 @@ function setup(shaders){
 
         multTranslation([0, TIRE_HEIGHT_FLOOR, 0]);
         pushMatrix();
-            //criar constante
-            multTranslation([0,0 , -TANK_DEPT/2]);
+            multTranslation([0,0 , -TIRE_DEPT]);
             wheel();
         popMatrix();
         pushMatrix();
-            //criar constante
-            multTranslation([0, 0, TANK_DEPT/2]);
+            multTranslation([0, 0, TIRE_DEPT]);
             wheel();
         popMatrix();
 
@@ -485,7 +494,6 @@ function setup(shaders){
 
     //wheels
     function wheel(){
-        //ver se rot funciona
         multRotationZ(rotWheels);
         pushMatrix();
             tire();
@@ -530,15 +538,13 @@ function setup(shaders){
 
     function fireProjetile(){
 
-        
-
         for(let i = 0; i < projetilesfires.length; i++){
 
             if(projetilesfires[i][0] == 0)
             projetilesfires[i][1] = lastMV;
 
             projetilesfires[i][0] += FRAME_RATE;
-            time = projetilesfires[i][0];
+            let time = projetilesfires[i][0];
 
             //obter WC
             let WC = mult(inverse(mView),projetilesfires[i][1]);
@@ -553,7 +559,7 @@ function setup(shaders){
 
             if(x[1] <= 0){
                 if(projetilesfires.length-1 == i)
-                fired = false;
+                    fired = false;
                 projetilesfires.splice(i,1);
             }
 
@@ -566,39 +572,7 @@ function setup(shaders){
             popMatrix();
 
         }
-
-
-
-        /*time += FRAME_RATE;
-
-        //obter WC
-        let WC = mult(inverse(mView),lastMV);
-
-        let x0 = mult(WC,vec4(0,0,0,1));
-
-        //speed = 1
-        let v0 = mult(normalMatrix(WC),vec4(0,5,0,0));
-
-        let x = add(x0, add(scale(time,v0),scale(0.5*time*time,gravity)));
-
-
-
-
-        if(x[1] <= 0)
-        fired = false;
-
-        pushMatrix();
-            
-            multTranslation([x[0], x[1], x[2]]);
-            multScale([BARREL_HEIGHT,BARREL_HEIGHT,BARREL_DEPT]);
-            
-            projetile();
-        popMatrix();
-
-        */
     }
-
-
 
 
     function render(){
@@ -625,10 +599,9 @@ function setup(shaders){
                 multTranslation([CENTER + movTank,FLOOR_HEIGHT/2,CENTER]);
                 tank();
             popMatrix();
-            pushMatrix();
-                if(fired){
-                    fireProjetile();
-                }
+            if(fired){
+                fireProjetile();
+            }
                
                
     

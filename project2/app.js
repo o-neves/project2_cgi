@@ -21,7 +21,7 @@ let movTank = 0.0;
 let rotWheels = 0;
 let zoom = 10;
 let turretDegree = 0;
-let barrelDegre = 15;
+let barrelDegree = 15;
 let lastMV = mat4();
 let stillFiring = false;
 let center_of_the_tank = 0;
@@ -125,14 +125,14 @@ function setup(shaders){
                 mode = gl.TRIANGLES;
                 break;
             case 'w':
-                if(MAX_BARREL_DEGREE > barrelDegre+BARREL_MOV)
-                barrelDegre += BARREL_MOV;
-                else barrelDegre = MAX_BARREL_DEGREE;
+                if(MAX_BARREL_DEGREE > barrelDegree+BARREL_MOV)
+                barrelDegree += BARREL_MOV;
+                else barrelDegree = MAX_BARREL_DEGREE;
             break;
             case 's':
-                if(MIN_BARREL_DEGREE < barrelDegre-BARREL_MOV)
-                barrelDegre -= BARREL_MOV;
-                else barrelDegre = MIN_BARREL_DEGREE;
+                if(MIN_BARREL_DEGREE < barrelDegree-BARREL_MOV)
+                barrelDegree -= BARREL_MOV;
+                else barrelDegree = MIN_BARREL_DEGREE;
             break;
             case 'a':
                 turretDegree += TURRET_MOV; 
@@ -286,7 +286,7 @@ function setup(shaders){
         //adicionar constante
         multTranslation([0 ,TURRET_BASE_HEIGHT*1.5,0]);
         pushMatrix();
-            multRotationZ(barrelDegre);
+            multRotationZ(barrelDegree);
             multTranslation([BARREL_WIDHT/2 ,0,0]);
             barrel();
         popMatrix();

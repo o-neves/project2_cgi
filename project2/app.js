@@ -20,17 +20,17 @@ let mView;
 let movTank = 0.0;
 let rotWheels = 0;
 let zoom = 10;
-let turretDegre = 0;
+let turretDegree = 0;
 let barrelDegre = 15;
 let lastMV = mat4();
-let fired = false;
+let stillFiring = false;
 let center_of_the_tank = 0;
 let projetilesfires = [];
 
 
-const offset = 0.001;
+const OFFSET = 0.001;
 const FRAME_RATE = 1/60;
-const gravity = vec4(0,-9.8,0,0);
+const GRAVITY = vec4(0,-9.8,0,0);
 const ZOOM = 10;
 const ZOOM_CHANGE = 0.1;
 
@@ -51,32 +51,31 @@ const SPEAR_WIDTH = Math.sqrt(Math.pow(TANK_DEPT,2)/2);
 
 //Wheels, tire and rim
 const WHEELS_PER_SIDE = 5;
-const TIRE_DIAMETER_SCALE = HULL_HEIGHT*0.5;
+const TIRE_DIAMETER_SCALE = HULL_HEIGHT/2;
 const TIRE_DIAMETER = 1.4 * TIRE_DIAMETER_SCALE;
 const TIRE_DEPT = TANK_DEPT/2;
-const NUMBER_OF_TIRES = 5;
 const RIM_DEPT_SCALE = TIRE_DEPT/2;
-const WHEELS_DEGREE = (1 * (TANK_MOVE / 1) * (180 / Math.PI));
+const WHEELS_DEGREE = (TANK_MOVE / (TIRE_DIAMETER/2)) * (180 / Math.PI);
 const TIRE_HEIGHT_FLOOR =  TIRE_DIAMETER/2 ;
 
 //Axel
 const AXEL_DIAMETER = TIRE_DIAMETER/6;
 
 
-//ver se dá para meter em melhor sitio
 const HULL_HEIGHT_FLOOR = TIRE_HEIGHT_FLOOR + HULL_HEIGHT/2;
 
 
-//turret and turret base
+//turret
 const TURRET_MOV = 5;
 const TURRET_WIDHT = HULL_WIDTH/2;
 const TURRET_HEIGHT = HULL_HEIGHT*1.1;
 const TURRET_DEPT = TANK_DEPT/1.5;
-const TURRET_HEIGHT_FLOOR = HULL_HEIGHT_FLOOR + HULL_HEIGHT/2;
+
+//Turret base
 const TURRET_BASE_WIDHT = TURRET_WIDHT*1.1;
 const TURRET_BASE_HEIGHT = TURRET_HEIGHT*0.1;
 const TURRET_BASE_DEPT= TURRET_DEPT*1.1;
-const TURRET_BASE_HEIGHT_FLOOR = TURRET_HEIGHT_FLOOR + TURRET_BASE_HEIGHT/2;
+const TURRET_BASE_HEIGHT_FLOOR = TIRE_HEIGHT_FLOOR + HULL_HEIGHT + TURRET_BASE_HEIGHT/2;
 
 
 
@@ -95,7 +94,7 @@ const BARREL_TIP_DEPT = BARREL_DEPT*1.1;
 
 const CENTER_ZOOM = (HULL_HEIGHT_FLOOR + FLOOR_HEIGHT) / (ZOOM/0.1);
 
-const MOVEMENT_LIMITE = ((CENTER) - (NUMBER_OF_TIRES/2 * TIRE_DIAMETER));
+const MOVEMENT_LIMITE = ((CENTER) - (WHEELS_PER_SIDE/2 * TIRE_DIAMETER));
 
 //ver se dá para melhorar
 const MIDDLE_AXEL_WIDTH = (WHEELS_PER_SIDE * TIRE_DIAMETER)/(TANK_DEPT*1.2);
@@ -136,14 +135,14 @@ function setup(shaders){
                 else barrelDegre = MIN_BARREL_DEGREE;
             break;
             case 'a':
-                turretDegre += TURRET_MOV; 
+                turretDegree += TURRET_MOV; 
             break;
             case 'd':
-                turretDegre -= TURRET_MOV; 
+                turretDegree -= TURRET_MOV; 
             break;
             case ' ':
                 //Dispara um projetil, devendo o mesmo sair pela extremidade do cano, na direção por este apontada
-                fired = true;
+                stillFiring = true;
                 projetilesfires.push([0,lastMV]);
                 
                 break;
@@ -217,7 +216,7 @@ function setup(shaders){
 
         gl.viewport(0,0,canvas.width, canvas.height);
 
-        mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*ZOOM, 3*ZOOM);
+        mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*CENTER, 3*CENTER);
    
     }
 
@@ -268,7 +267,7 @@ function setup(shaders){
         
         pushMatrix()
             multTranslation([0 ,TURRET_BASE_HEIGHT_FLOOR, 0]);
-            multRotationY(turretDegre);
+            multRotationY(turretDegree);
             turretAndBarrel();
         popMatrix();
         
@@ -396,7 +395,7 @@ function setup(shaders){
     function spear(){
         multRotationY(45);
         //offset - minor offset because of shadow
-        multScale([SPEAR_WIDTH, HULL_HEIGHT - offset, SPEAR_WIDTH]);
+        multScale([SPEAR_WIDTH, HULL_HEIGHT - OFFSET, SPEAR_WIDTH]);
 
         uploadColor(vec3(0.361,0.294,0.451));
         uploadModelView();
@@ -541,22 +540,24 @@ function setup(shaders){
         for(let i = 0; i < projetilesfires.length; i++){
 
             if(projetilesfires[i][0] == 0){
-            projetilesfires[i][1] = lastMV;
+            //projetilesfires[i][1] = lastMV;
 
             //obter WC
             let WC = mult(inverse(mView),lastMV);
             
             //xo
-            projetilesfires[i].push(mult(WC,vec4(0,0,0,1)));
+            let x0 = mult(WC,vec4(0,0,0,1));
+            projetilesfires[i].push(x0);
 
             //v0
-            projetilesfires[i].push(mult(normalMatrix(WC),vec4(0,5,0,0)));
+            let v0 = mult(normalMatrix(WC),vec4(0,5,0,0))
+            projetilesfires[i].push(v0);
 
             }
             
             let time = projetilesfires[i][0];
 
-            let x = add(projetilesfires[i][2], add(scale(time,projetilesfires[i][3]),scale(0.5*time*time,gravity)));
+            let x = add(projetilesfires[i][2], add(scale(time,projetilesfires[i][3]),scale(0.5*time*time,GRAVITY)));
 
             pushMatrix();
                 
@@ -570,7 +571,7 @@ function setup(shaders){
 
             if(x[1] <= 0){
                 if(projetilesfires.length-1 == i)
-                    fired = false;
+                    stillFiring = false;
                 projetilesfires.splice(i,1);
             }
             
@@ -604,7 +605,7 @@ function setup(shaders){
                 tank();
             popMatrix();
             pushMatrix();
-            if(fired){
+            if(stillFiring){
                 fireProjetile();
             }
                

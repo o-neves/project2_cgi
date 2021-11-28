@@ -81,7 +81,7 @@ const TURRET_BASE_HEIGHT_FLOOR = TURRET_HEIGHT_FLOOR + TURRET_BASE_HEIGHT/2;
 
 
 //barrel
-const MAX_BARREL_DEGREE = 180;
+const MAX_BARREL_DEGREE = 90;
 const MIN_BARREL_DEGREE = 0;
 const BARREL_MOV = 5;
 const BARREL_WIDHT = TURRET_WIDHT;
@@ -175,7 +175,7 @@ function setup(shaders){
             break;
             case '4':
                 //projecao axonometrica
-                mView = lookAt(vec3(FLOOR_CUBES,4,FLOOR_CUBES),vec3(CENTER,0,CENTER),vec3(0,1,0));
+                mView = lookAt(vec3(FLOOR_CUBES,4,0),vec3(CENTER,0,CENTER),vec3(0,1,0));
             break;
             case '+':
                 if (zoom - ZOOM_CHANGE > 0.1){
@@ -217,7 +217,6 @@ function setup(shaders){
 
         gl.viewport(0,0,canvas.width, canvas.height);
 
-        //mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom + HULL_HEIGHT_FLOOR, zoom + HULL_HEIGHT_FLOOR, -3*ZOOM, 3*ZOOM);
         mProjection = ortho (-zoom*aspect, zoom*aspect, -zoom, zoom, -3*ZOOM, 3*ZOOM);
    
     }
@@ -356,9 +355,10 @@ function setup(shaders){
         //criar constantes  
         multTranslation([BARREL_WIDHT/2, 0, 0]); 
         multRotationZ(-90);
-        multScale([BARREL_TIP_HEIGTH,BARREL_TIP_WIDTH ,BARREL_TIP_DEPT]);
-
+       
         lastMV = modelView();
+
+        multScale([BARREL_TIP_HEIGTH,BARREL_TIP_WIDTH ,BARREL_TIP_DEPT]);
 
         uploadColor(vec3(0.498,0.443,0.588));
         uploadModelView();
@@ -540,28 +540,23 @@ function setup(shaders){
 
         for(let i = 0; i < projetilesfires.length; i++){
 
-            if(projetilesfires[i][0] == 0)
+            if(projetilesfires[i][0] == 0){
             projetilesfires[i][1] = lastMV;
 
-            projetilesfires[i][0] += FRAME_RATE;
+            //obter WC
+            let WC = mult(inverse(mView),lastMV);
+            
+            //xo
+            projetilesfires[i].push(mult(WC,vec4(0,0,0,1)));
+
+            //v0
+            projetilesfires[i].push(mult(normalMatrix(WC),vec4(0,5,0,0)));
+
+            }
+            
             let time = projetilesfires[i][0];
 
-            //obter WC
-            let WC = mult(inverse(mView),projetilesfires[i][1]);
-
-            let x0 = mult(WC,vec4(0,0,0,1));
-            
-            //speed = 5
-            let v0 = mult(normalMatrix(WC),vec4(0,5,0,0));
-
-
-            let x = add(x0, add(scale(time,v0),scale(0.5*time*time,gravity)));
-
-            if(x[1] <= 0){
-                if(projetilesfires.length-1 == i)
-                    fired = false;
-                projetilesfires.splice(i,1);
-            }
+            let x = add(projetilesfires[i][2], add(scale(time,projetilesfires[i][3]),scale(0.5*time*time,gravity)));
 
             pushMatrix();
                 
@@ -570,6 +565,15 @@ function setup(shaders){
                 
                 projetile();
             popMatrix();
+
+            projetilesfires[i][0] += FRAME_RATE; 
+
+            if(x[1] <= 0){
+                if(projetilesfires.length-1 == i)
+                    fired = false;
+                projetilesfires.splice(i,1);
+            }
+            
 
         }
     }
@@ -599,6 +603,7 @@ function setup(shaders){
                 multTranslation([CENTER + movTank,FLOOR_HEIGHT/2,CENTER]);
                 tank();
             popMatrix();
+            pushMatrix();
             if(fired){
                 fireProjetile();
             }

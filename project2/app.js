@@ -32,6 +32,7 @@ const FRAME_RATE = 1/60;
 const ZOOM = 10;
 const ZOOM_CHANGE = 0.1;
 
+
 const MAX_BARREL_DEGREE = 180;
 const MIN_BARREL_DEGREE = 0;
 const BARREL_MOV = 5;
@@ -40,6 +41,7 @@ const PI = 3.14159265359;
 const FLOOR_DIAMETER = 1;
 const HULL_HEIGHT = 1.5;
 const FLOOR_CUBES = 20;
+const WHEELS_PER_SIDE = 5;
 const TANK_MOVE = 0.1;
 const TANK_DEPT = HULL_HEIGHT * 2;
 const CENTER = FLOOR_CUBES/2;
@@ -48,9 +50,13 @@ const FLOOR_HEIGHT = 0.5 * FLOOR_DIAMETER;
 
 const HULL_WIDTH = HULL_HEIGHT * 4;
 
-const TIRE_DIAMETER_SCALE = HULL_HEIGHT/2;
+const SPEAR_WIDTH = Math.sqrt(Math.pow(TANK_DEPT,2)/2);
+
+const TIRE_DIAMETER_SCALE = HULL_HEIGHT*0.5;
 const TIRE_DIAMETER = 1.4 * TIRE_DIAMETER_SCALE;
-const TIRE_HEIGHT_FLOOR = FLOOR_HEIGHT/2 + TIRE_DIAMETER/2 ;
+//sera que uso
+const TIRE_HEIGHT_FLOOR =  TIRE_DIAMETER/2 ;
+
 const TIRE_DEPT = TANK_DEPT/2;
 const NUMBER_OF_TIRES = 5;
 
@@ -67,15 +73,15 @@ const TURRET_HEIGHT_FLOOR = HULL_HEIGHT_FLOOR + HULL_HEIGHT/2;
 const BARREL_WIDHT = TURRET_WIDHT;
 const BARREL_HEIGHT = TURRET_HEIGHT/6.5; 
 const BARREL_DEPT = TURRET_DEPT/6; 
-const BARREL_WIDHT_FLOOR = CENTER+TURRET_WIDHT/2;
-const BARREL_HEIGHT_FLOOR = HULL_HEIGHT_FLOOR + HULL_HEIGHT/1.1; 
+
 
 const TURRET_BASE_WIDHT = TURRET_WIDHT*1.1;
 const TURRET_BASE_HEIGHT = TURRET_HEIGHT*0.1;
 const TURRET_BASE_DEPT= TURRET_DEPT*1.1;
 const TURRET_BASE_HEIGHT_FLOOR = TURRET_HEIGHT_FLOOR + TURRET_BASE_HEIGHT/2;
 
-const MIDDLE_AXEL_WIDTH = TIRE_DIAMETER*4;
+//ver se dá para melhorar
+const MIDDLE_AXEL_WIDTH = (WHEELS_PER_SIDE * TIRE_DIAMETER)/(TANK_DEPT*1.2);
 
 
 function setup(shaders){
@@ -204,6 +210,7 @@ function setup(shaders){
     }
 
 
+    //tiles
     function tiles(x,z){
 
         if((z%2 == 0 && x%2 != 0) || (x%2 == 0 && z%2 != 0)){
@@ -217,6 +224,7 @@ function setup(shaders){
 
     }
 
+    //floor
     function floor(){
 
         for(let i = 0; i < FLOOR_CUBES;i++){
@@ -231,36 +239,55 @@ function setup(shaders){
        
     }
 
+    //tank
     function tank(){
 
         pushMatrix();
             hull();
         popMatrix();
-        pushMatrix();
-            multTranslation([CENTER ,TURRET_BASE_HEIGHT_FLOOR, CENTER]);
+        
+        pushMatrix()
+            multTranslation([0 ,TURRET_BASE_HEIGHT_FLOOR, 0]);
             multRotationY(turretDegre);
             turretAndBarrel();
         popMatrix();
+        
         pushMatrix();
-            axleSet();
+            wheelsAndAxis();
         popMatrix();
        
     }
 
+    //Barrel e Turret juntos
     function turretAndBarrel(){
         pushMatrix();
             turret();
         popMatrix();
-        multTranslation([0,BARREL_HEIGHT,0]);
+        
+        //adicionar constante
+        multTranslation([0 ,TURRET_BASE_HEIGHT*1.5,0]);
         pushMatrix();
             multRotationZ(barrelDegre);
-            multTranslation([BARREL_WIDHT/2,0,0]);
+            multTranslation([BARREL_WIDHT/2 ,0,0]);
             barrel();
         popMatrix();
         
+        
     }
 
+    //turret
+    function turret(){
+        
+        pushMatrix();
+            turretBase();
+        popMatrix();
 
+        pushMatrix();
+            turretPopOut();
+        popMatrix();
+    }
+
+    //turret pop out
     function turretPopOut(){
         multScale([TURRET_WIDHT, TURRET_HEIGHT, TURRET_DEPT]);
 
@@ -269,16 +296,7 @@ function setup(shaders){
         SPHERE.draw(gl, program, mode);
     }
 
-    function turret(){
-       
-        pushMatrix();
-            turretBase();
-        popMatrix();
-        pushMatrix();
-            turretPopOut();
-        popMatrix();
-    }
-
+    //turret base
     function turretBase(){
         multScale([TURRET_BASE_WIDHT , TURRET_BASE_HEIGHT, TURRET_BASE_DEPT]);
 
@@ -287,9 +305,11 @@ function setup(shaders){
         CYLINDER.draw(gl, program, mode);
     }
 
+    //Barrel
     function barrel(){
-        multScale([BARREL_WIDHT, BARREL_HEIGHT, BARREL_DEPT]);
-        multRotationZ([-90]);
+        multRotationZ(90);
+        multScale([BARREL_HEIGHT,BARREL_WIDHT,BARREL_DEPT]);
+
         lastMV = modelView();
         
 
@@ -298,40 +318,47 @@ function setup(shaders){
         CYLINDER.draw(gl, program, mode);
     }
 
-    
+    //hull
     function hull(){
+        multTranslation([0,HULL_HEIGHT_FLOOR,0]);
         pushMatrix();
-            bottomHull();
+            baseHull();
         popMatrix();
+       
         pushMatrix();
             spearHull();
         popMatrix();
+        
     }
 
+    //edges of the hull
     function spearHull(){
+        //adicionar constante
         pushMatrix();
-            multTranslation([CENTER + HULL_WIDTH/2,HULL_HEIGHT_FLOOR,CENTER]);
+            multTranslation([HULL_WIDTH/2,0,0]);
             spear();
         popMatrix();
         pushMatrix();
-            multTranslation([CENTER - HULL_WIDTH/2,HULL_HEIGHT_FLOOR,CENTER]);
+            multTranslation([-HULL_WIDTH/2,0,0]);
             spear();
         popMatrix();
     }
 
+    //spear
     function spear(){
-        multScale([1, HULL_HEIGHT,  Math.sqrt(Math.pow(TANK_DEPT,2)/2) ]);
-        multRotationY([45]);
+        multRotationY(45);
+        //minor offset because of shadow
+        multScale([SPEAR_WIDTH, HULL_HEIGHT - 0.001, SPEAR_WIDTH]);
 
         uploadColor(vec3(0.361,0.294,0.451));
         uploadModelView();
         CUBE.draw(gl, program, mode);
     }
 
-    function bottomHull(){
-        multTranslation([CENTER,HULL_HEIGHT_FLOOR,CENTER]);
-        multScale([HULL_WIDTH, HULL_HEIGHT, TANK_DEPT]);
+    //Hull base
+    function baseHull(){
         multRotationZ(180);
+        multScale([HULL_WIDTH, HULL_HEIGHT, TANK_DEPT]);
 
         uploadColor(vec3(0.361,0.294,0.451));
         uploadModelView();
@@ -340,7 +367,8 @@ function setup(shaders){
 
 
 
-    function axleSet(){
+    //wheels and axis together
+    function wheelsAndAxis(){
         pushMatrix();
             wheelsAndAxle();
         popMatrix();
@@ -366,20 +394,19 @@ function setup(shaders){
         popMatrix();
 
         pushMatrix();
-            multTranslation([CENTER, TIRE_HEIGHT_FLOOR ,CENTER]);
-            //ARRANJAR CONSTANTE PARA X,Y,Z
-            multScale([MIDDLE_AXEL_WIDTH, TIRE_DIAMETER/6, TIRE_DIAMETER/6]);  //((NUMBER_OF_TIRES - 2) * TIRE_DIAMETER) + 2 * (0.5 * TIRE_DIAMETER)
             multRotationY(90);
+            multScale([1, 1, MIDDLE_AXEL_WIDTH]);
             axle();
         popMatrix();
+        
     }
 
+    //pair of wheels and axle in between
     function wheelsAndAxle(){
-        pushMatrix();
-            multTranslation([CENTER , TIRE_HEIGHT_FLOOR ,CENTER]);
-            multScale([TIRE_DIAMETER/6, TIRE_DIAMETER/6, TANK_DEPT]);
+       pushMatrix();
             axle();
-        popMatrix(); 
+        popMatrix();
+
         pushMatrix();
             pairWheels();
         popMatrix();
@@ -387,8 +414,12 @@ function setup(shaders){
     }
 
 
+    //axle
     function axle(){
+        multTranslation([0 , TIRE_HEIGHT_FLOOR ,0]);
         multRotationX(90);
+        //criar constante
+        multScale([TIRE_DIAMETER/6, TANK_DEPT, TIRE_DIAMETER/6 ]);
 
         uploadColor(vec3(0.78,0.761,0.929));
         uploadModelView();
@@ -399,45 +430,59 @@ function setup(shaders){
 
     function pairWheels(){
 
-        multTranslation([CENTER,TIRE_HEIGHT_FLOOR ,CENTER - TANK_DEPT/2]);
+        multTranslation([0, TIRE_HEIGHT_FLOOR, 0]);
         pushMatrix();
-            tire();
+            //criar constante
+            multTranslation([0,0 , -TANK_DEPT/2]);
+            wheel();
         popMatrix();
         pushMatrix();
-            rim();
+            //criar constante
+            multTranslation([0, 0, TANK_DEPT/2]);
+            wheel();
         popMatrix();
-        multTranslation([0, 0, TANK_DEPT]);
-        pushMatrix();
-           tire();
-        popMatrix();
-        pushMatrix();
-            rim();
-        popMatrix();
+
+        
+        
   
     }
 
-
-    function tire(){
-        
-        multScale([TIRE_DIAMETER_SCALE,TIRE_DIAMETER_SCALE,TIRE_DEPT]);
+    //wheels
+    function wheel(){
+        //ver se rot funciona
         multRotationZ(rot);
+        pushMatrix();
+            tire();
+        popMatrix();
+
+        pushMatrix();
+            rim();
+        popMatrix();
+        
+    }
+
+
+    //tire
+    function tire(){
         multRotationX(90);
+        multScale([TIRE_DIAMETER_SCALE,TIRE_DEPT,TIRE_DIAMETER_SCALE]);
         
         uploadColor(vec3(0.584,0.49,0.678));
         uploadModelView();
         TORUS.draw(gl, program, mode);
     }
 
+    //Tire rim
     function rim(){  
-
+        
         multScale([TIRE_DIAMETER_SCALE,TIRE_DIAMETER_SCALE,RIM_DEPT_SCALE]);
-        multRotationZ(rot);
 
         uploadColor(vec3(1,1,1));
         uploadModelView();
         SPHERE.draw(gl, program, mode);
     } 
 
+    //projetile
     function projetile(){
 
         uploadColor(vec3(1,1,1));
@@ -455,7 +500,8 @@ function setup(shaders){
         let WC = mult(inverse(mView),lastMV);
 
         let x0 = mult(WC,vec4(0,0,0,1));
-        //speed = 10
+
+        //speed = 3
         let v0 = mult(normalMatrix(WC),vec4(0,3,0,0));
 
         //x = x0 + v0*time + (9,8*0.5)*time*time;
@@ -501,6 +547,7 @@ function setup(shaders){
             popMatrix();
             
             pushMatrix();
+                multTranslation([CENTER + mov,FLOOR_HEIGHT/2,CENTER]);
                 tank();
             popMatrix();
             pushMatrix();

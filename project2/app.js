@@ -12,9 +12,9 @@ import { inverse, mat4, normalMatrix, vec4 } from "../libs/MV.js";
 /** @type WebGLRenderingContext */
 let gl;
 
-//let time = 0;           // Global simulation time in days
-//let speed = 1/60.0;     // Speed (how many days added to time on each render pass
-let mode;               // Drawing mode (gl.LINES or gl.TRIANGLES)
+
+
+let mode;    
 let mProjection;
 let mView;
 let mov = 0.0;
@@ -305,15 +305,34 @@ function setup(shaders){
         CYLINDER.draw(gl, program, mode);
     }
 
-    //Barrel
+    
     function barrel(){
         multRotationZ(90);
         multScale([BARREL_HEIGHT,BARREL_WIDHT,BARREL_DEPT]);
 
+        pushMatrix();
+            barrelPipe();
+        popMatrix();
+        pushMatrix();
+            barrelTip();
+        popMatrix();
+
         lastMV = modelView();
-        
 
         uploadColor(vec3(0.655,0.608,0.741));
+        uploadModelView();
+        CYLINDER.draw(gl, program, mode);
+    }
+
+    //ver
+    function barrelTip(){
+        multTranslation([BARREL_WIDHT-(BARREL_WIDHT*0.5), 0 , 0]);
+        multRotationZ([-90]);
+        multScale([BARREL_HEIGHT + (BARREL_HEIGHT*0.25), BARREL_WIDHT/4, BARREL_HEIGHT + (BARREL_HEIGHT*0.25)]);
+
+        lastMV = modelView();
+
+        uploadColor(vec3(0.498,0.443,0.588));
         uploadModelView();
         CYLINDER.draw(gl, program, mode);
     }
